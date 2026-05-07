@@ -1,3 +1,4 @@
+import { ApplicationDashboard } from '@/features/applications/components/application-dashboard';
 import { CompanyInsightsCard } from '@/features/company-research/components/company-insights-card';
 import { AnalysisDashboard } from '@/features/job-analysis/components/analysis-dashboard';
 import { ProfileSummaryCard } from '@/features/profile/components/profile-summary';
@@ -24,6 +25,9 @@ export function HomeRoute(): JSX.Element {
 
   return (
     <section className="grid gap-4 md:grid-cols-2">
+      <div className="md:col-span-2">
+        <ApplicationDashboard />
+      </div>
       <div className="md:col-span-2">
         <AnalysisDashboard />
       </div>

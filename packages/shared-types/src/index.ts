@@ -351,3 +351,62 @@ export type CompanyResearchResponse = {
   tailoredMotivationAnswers: TailoredMotivationAnswers;
   generated: boolean;
 };
+
+export type ApplicationStatus =
+  | 'saved'
+  | 'applied'
+  | 'interviewing'
+  | 'offer'
+  | 'rejected'
+  | 'withdrawn';
+
+export type ApplicationPriority = 'high' | 'medium' | 'low';
+
+export type ApplicationStatusEvent = {
+  id: string;
+  status: ApplicationStatus;
+  createdAt: string;
+  note?: string;
+};
+
+export type ApplicationRecord = {
+  id: string;
+  companyName: string;
+  roleTitle: string;
+  location?: string;
+  sourcePlatform: ATSProvider;
+  sourceUrl: string;
+  salaryText?: string;
+  notes?: string;
+  priority: ApplicationPriority;
+  status: ApplicationStatus;
+  appliedAt?: string;
+  interviewCount: number;
+  lastResponseAt?: string;
+  createdAt: string;
+  updatedAt: string;
+  history: ApplicationStatusEvent[];
+  tags: string[];
+};
+
+export type ApplicationDashboardRecord = {
+  applications: ApplicationRecord[];
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type ApplicationAnalytics = {
+  totalApplications: number;
+  activeApplications: number;
+  interviewCount: number;
+  rejectionCount: number;
+  offerCount: number;
+  responseRate: number;
+  interviewRate: number;
+  rejectionRate: number;
+  statusCounts: Record<ApplicationStatus, number>;
+  monthlyApplications: Array<{
+    month: string;
+    count: number;
+  }>;
+};

@@ -1,4 +1,6 @@
 import type {
+  ApplicationAnalytics,
+  ApplicationDashboardRecord,
   CompanyResearchResponse,
   ExtensionSettings,
   ExtensionSnapshot,
@@ -17,6 +19,10 @@ type ExtensionState = {
   companyResearch: CompanyResearchResponse | null;
   companyResearchLoading: boolean;
   companyResearchError: string | null;
+  applicationDashboard: ApplicationDashboardRecord | null;
+  applicationAnalytics: ApplicationAnalytics | null;
+  applicationDashboardLoading: boolean;
+  applicationDashboardError: string | null;
   error: string | null;
   setSnapshot: (snapshot: ExtensionSnapshot | null) => void;
   setSettings: (settings: ExtensionSettings | null) => void;
@@ -27,6 +33,10 @@ type ExtensionState = {
   setCompanyResearch: (research: CompanyResearchResponse | null) => void;
   setCompanyResearchLoading: (loading: boolean) => void;
   setCompanyResearchError: (error: string | null) => void;
+  setApplicationDashboard: (dashboard: ApplicationDashboardRecord | null) => void;
+  setApplicationAnalytics: (analytics: ApplicationAnalytics | null) => void;
+  setApplicationDashboardLoading: (loading: boolean) => void;
+  setApplicationDashboardError: (error: string | null) => void;
   setError: (error: string | null) => void;
 };
 
@@ -40,6 +50,10 @@ export const useExtensionStore = create<ExtensionState>((set) => ({
   companyResearch: null,
   companyResearchLoading: false,
   companyResearchError: null,
+  applicationDashboard: null,
+  applicationAnalytics: null,
+  applicationDashboardLoading: false,
+  applicationDashboardError: null,
   error: null,
   setSnapshot: (snapshot) => set({ snapshot }),
   setSettings: (settings) => set({ settings }),
@@ -50,5 +64,10 @@ export const useExtensionStore = create<ExtensionState>((set) => ({
   setCompanyResearch: (companyResearch) => set({ companyResearch }),
   setCompanyResearchLoading: (companyResearchLoading) => set({ companyResearchLoading }),
   setCompanyResearchError: (companyResearchError) => set({ companyResearchError }),
+  setApplicationDashboard: (applicationDashboard) => set({ applicationDashboard }),
+  setApplicationAnalytics: (applicationAnalytics) => set({ applicationAnalytics }),
+  setApplicationDashboardLoading: (applicationDashboardLoading) =>
+    set({ applicationDashboardLoading }),
+  setApplicationDashboardError: (applicationDashboardError) => set({ applicationDashboardError }),
   setError: (error) => set({ error }),
 }));
