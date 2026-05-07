@@ -13,6 +13,8 @@ import { registerContentMessageHandlers } from './runtime';
 
 let hasBootstrapped = false;
 let changeNotificationTimer: number | null = null;
+let pageObserver: MutationObserver | null = null;
+let removeDynamicRescanTriggers: (() => void) | null = null;
 const assistantOverlay = new AiAssistantOverlay();
 const buttonManager = new AiGenerateButtonManager(assistantOverlay);
 
@@ -43,7 +45,7 @@ function schedulePageStateNotification(): void {
   }, 250);
 }
 
-function registerDynamicRescanTriggers(): void {
+function registerDynamicRescanTriggers(): () => void {
   const triggerRescan = () => schedulePageStateNotification();
 
   document.addEventListener('input', triggerRescan, true);
@@ -53,6 +55,24 @@ function registerDynamicRescanTriggers(): void {
   window.setTimeout(() => {
     triggerRescan();
   }, 1500);
+
+  return () => {
+    document.removeEventListener('input', triggerRescan, true);
+    document.removeEventListener('change', triggerRescan, true);
+  };
+}
+
+function teardownContentScript(): void {
+  if (changeNotificationTimer !== null) {
+    window.clearTimeout(changeNotificationTimer);
+    changeNotificationTimer = null;
+  }
+
+  pageObserver?.disconnect();
+  pageObserver = null;
+  removeDynamicRescanTriggers?.();
+  removeDynamicRescanTriggers = null;
+  assistantOverlay.close();
 }
 
 async function bootstrapContentScript(): Promise<void> {
@@ -73,11 +93,12 @@ async function bootstrapContentScript(): Promise<void> {
   await notifyPageState();
   buttonManager.attachButtons();
 
-  observeDocument(() => {
+  pageObserver = observeDocument(() => {
     schedulePageStateNotification();
     buttonManager.attachButtons();
   });
-  registerDynamicRescanTriggers();
+  removeDynamicRescanTriggers = registerDynamicRescanTriggers();
+  window.addEventListener('pagehide', teardownContentScript, { once: true });
 }
 
 void bootstrapContentScript();

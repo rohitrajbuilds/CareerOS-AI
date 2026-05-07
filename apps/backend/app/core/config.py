@@ -1,6 +1,6 @@
 from functools import lru_cache
 
-from pydantic import Field
+from pydantic import Field, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -12,7 +12,7 @@ class Settings(BaseSettings):
     port: int = Field(default=8000, alias="BACKEND_PORT")
     cors_origins_raw: str = Field(default="http://localhost:3000", alias="BACKEND_CORS_ORIGINS")
     cors_origin_regex: str = Field(
-        default=r"^(chrome-extension://.*|https://.*|http://localhost(:\d+)?)$",
+        default=r"^(chrome-extension://[a-z]{32}|https://([a-z0-9-]+\.)*careeros\.ai|http://localhost(:\d+)?)$",
         alias="BACKEND_CORS_ORIGIN_REGEX",
     )
     database_url: str = Field(
@@ -31,6 +31,12 @@ class Settings(BaseSettings):
     analytics_cache_ttl_seconds: int = Field(default=120, alias="ANALYTICS_CACHE_TTL_SECONDS")
     log_level: str = Field(default="INFO", alias="LOG_LEVEL")
     enable_db_auto_create: bool = Field(default=True, alias="ENABLE_DB_AUTO_CREATE")
+
+    @model_validator(mode="after")
+    def validate_production_settings(self) -> "Settings":
+        if self.environment == "production" and self.secret_key == "change-me":
+            raise ValueError("SECRET_KEY must be set to a non-default value in production.")
+        return self
 
     @property
     def cors_origins(self) -> list[str]:

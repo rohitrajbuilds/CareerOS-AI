@@ -4,6 +4,14 @@ function getStorageArea(area: StorageAreaName): chrome.storage.StorageArea {
   return area === 'session' ? chrome.storage.session : chrome.storage.local;
 }
 
+function cloneStorageValue<TValue>(value: TValue): TValue {
+  if (typeof globalThis.structuredClone === 'function') {
+    return globalThis.structuredClone(value);
+  }
+
+  return JSON.parse(JSON.stringify(value)) as TValue;
+}
+
 export async function getFromStorage<TKey extends keyof StorageSchema>(
   key: TKey,
   area: StorageAreaName = 'local',
@@ -12,7 +20,7 @@ export async function getFromStorage<TKey extends keyof StorageSchema>(
   const result = await storageArea.get(key);
 
   if (result[key] === undefined) {
-    return storageDefaults[key];
+    return cloneStorageValue(storageDefaults[key]);
   }
 
   return result[key] as StorageSchema[TKey];

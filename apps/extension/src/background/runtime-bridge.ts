@@ -1,4 +1,5 @@
 import type {
+  AnalyzeFormMessage,
   AnalyzeFormResponse,
   AutofillResponse,
   AutofillFormMessage,
@@ -116,6 +117,23 @@ export async function requestPageStateForTab(
   }
 
   return createSuccessResult({ fieldCount: response.data.fields.length });
+}
+
+export async function recordAnalyzedFieldsForTab(
+  tabId: number,
+  payload: AnalyzeFormMessage['payload'],
+): Promise<AnalyzeFormResponse> {
+  const session = await getTabSession(tabId);
+  if (session) {
+    await upsertTabSession({
+      ...session,
+      fieldCount: payload.fields.length,
+      provider: payload.provider,
+      status: 'ready',
+    });
+  }
+
+  return createSuccessResult({ fieldCount: payload.fields.length });
 }
 
 export async function requestJobAnalysisContextForTab(

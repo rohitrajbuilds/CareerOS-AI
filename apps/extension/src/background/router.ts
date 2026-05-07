@@ -9,7 +9,7 @@ import {
   getSnapshotResponse,
   getTabSessionResponse,
   handleContentReady,
-  requestPageStateForTab,
+  recordAnalyzedFieldsForTab,
   requestJobAnalysisContextForTab,
   resolveTargetTabId,
   triggerAutofillForTab,
@@ -67,7 +67,7 @@ async function handleMessage(
     case MessageType.BackendHealthCheck:
       return createSuccessResult(await extensionApi.health());
     case MessageType.AnalyzeForm:
-      return requestPageStateForTab(await resolveTargetTabId(sender));
+      return recordAnalyzedFieldsForTab(await resolveTargetTabId(sender), message.payload);
     case MessageType.AutofillForm:
       return triggerAutofillForTab(await resolveTargetTabId(sender), message.payload);
     case MessageType.AutofillResult:

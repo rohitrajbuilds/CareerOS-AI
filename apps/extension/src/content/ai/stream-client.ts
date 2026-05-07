@@ -48,15 +48,27 @@ export async function streamAiResponse(
   const decoder = new TextDecoder();
   let buffer = '';
 
-  while (true) {
-    const { value, done } = await reader.read();
-    if (done) {
-      break;
+  try {
+    while (true) {
+      const { value, done } = await reader.read();
+      if (done) {
+        break;
+      }
+
+      buffer += decoder.decode(value, { stream: true });
+      const parsed = parseSseEvents(buffer);
+      buffer = parsed.remainder;
+      parsed.events.forEach(handlers.onEvent);
     }
 
-    buffer += decoder.decode(value, { stream: true });
-    const parsed = parseSseEvents(buffer);
-    buffer = parsed.remainder;
+    const finalChunk = decoder.decode();
+    if (finalChunk) {
+      buffer += finalChunk;
+    }
+
+    const parsed = parseSseEvents(`${buffer}\n\n`);
     parsed.events.forEach(handlers.onEvent);
+  } finally {
+    await reader.cancel().catch(() => undefined);
   }
 }

@@ -25,6 +25,10 @@ function manifestTransformPlugin(mode: string): Plugin {
         manifest.host_permissions = (manifest.host_permissions ?? []).filter(
           (pattern) => !pattern.includes('localhost'),
         );
+      } else {
+        manifest.host_permissions = Array.from(
+          new Set([...(manifest.host_permissions ?? []), 'http://localhost:8000/*']),
+        );
       }
 
       const targetPath = resolve(outputDir, 'manifest.json');

@@ -10,8 +10,7 @@
     "https://*.myworkdayjobs.com/*",
     "https://*.linkedin.com/*",
     "https://*.greenhouse.io/*",
-    "https://*.lever.co/*",
-    "http://localhost:8000/*"
+    "https://*.lever.co/*"
   ],
   "background": {
     "service_worker": "background/service-worker.js",
