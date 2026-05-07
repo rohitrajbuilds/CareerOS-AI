@@ -25,19 +25,6 @@
     "default_path": "sidepanel.html"
   },
   "options_page": "options.html",
-  "content_scripts": [
-    {
-      "matches": [
-        "https://*.workday.com/*",
-        "https://*.myworkdayjobs.com/*",
-        "https://*.linkedin.com/*",
-        "https://*.greenhouse.io/*",
-        "https://*.lever.co/*"
-      ],
-      "js": ["content/content.js"],
-      "run_at": "document_idle"
-    }
-  ],
   "web_accessible_resources": [
     {
       "resources": ["assets/*"],

@@ -1,31 +1,67 @@
 import { sendRuntimeMessage } from '@/lib/message-bus/runtime';
-import type { AnalyzeFormMessage, SiteContextDetectedMessage } from '@/lib/schema/messages';
+import type {
+  AnalyzeFormMessage,
+  ContentReadyMessage,
+  SiteContextDetectedMessage,
+} from '@/lib/schema/messages';
 import { MessageType } from '@/lib/schema/message-types';
 import { autofillKnownFields } from './core/autofill-engine';
 import { observeDocument } from './core/dom-observer';
-import { detectFormFields } from './core/field-detector';
-import { getSiteContext } from './core/site-context';
+import { getPageState } from './core/page-state';
+import { registerContentMessageHandlers } from './runtime';
 
-async function bootstrapContentScript(): Promise<void> {
-  const siteContext = getSiteContext();
+let hasBootstrapped = false;
+let changeNotificationTimer: number | null = null;
+
+async function notifyPageState(): Promise<void> {
+  const pageState = getPageState();
 
   await sendRuntimeMessage<unknown>({
     type: MessageType.SiteContextDetected,
-    payload: siteContext,
+    payload: pageState.siteContext,
   } satisfies SiteContextDetectedMessage);
 
-  const fields = detectFormFields();
   await sendRuntimeMessage<unknown>({
     type: MessageType.AnalyzeForm,
     payload: {
-      provider: siteContext.provider,
-      fields,
+      provider: pageState.siteContext.provider,
+      fields: pageState.fields,
     },
   } satisfies AnalyzeFormMessage);
+}
+
+function schedulePageStateNotification(): void {
+  if (changeNotificationTimer !== null) {
+    window.clearTimeout(changeNotificationTimer);
+  }
+
+  changeNotificationTimer = window.setTimeout(() => {
+    void notifyPageState();
+  }, 250);
+}
+
+async function bootstrapContentScript(): Promise<void> {
+  if (hasBootstrapped) {
+    return;
+  }
+  hasBootstrapped = true;
+
+  registerContentMessageHandlers();
+
+  await sendRuntimeMessage<unknown>({
+    type: MessageType.ContentReady,
+    payload: {
+      href: window.location.href,
+    },
+  } satisfies ContentReadyMessage);
+
+  await notifyPageState();
 
   observeDocument(() => {
-    void autofillKnownFields();
+    schedulePageStateNotification();
   });
+
+  void autofillKnownFields();
 }
 
 void bootstrapContentScript();

@@ -1,16 +1,24 @@
-import type { HealthResponse, SiteContext } from '@careeros/shared-types';
+import type { ExtensionSettings, ExtensionSnapshot, HealthResponse } from '@careeros/shared-types';
 import { create } from 'zustand';
 
 type ExtensionState = {
-  siteContext: SiteContext | null;
+  snapshot: ExtensionSnapshot | null;
+  settings: ExtensionSettings | null;
   backendHealth: HealthResponse | null;
-  setSiteContext: (siteContext: SiteContext | null) => void;
+  error: string | null;
+  setSnapshot: (snapshot: ExtensionSnapshot | null) => void;
+  setSettings: (settings: ExtensionSettings | null) => void;
   setBackendHealth: (health: HealthResponse | null) => void;
+  setError: (error: string | null) => void;
 };
 
 export const useExtensionStore = create<ExtensionState>((set) => ({
-  siteContext: null,
+  snapshot: null,
+  settings: null,
   backendHealth: null,
-  setSiteContext: (siteContext) => set({ siteContext }),
+  error: null,
+  setSnapshot: (snapshot) => set({ snapshot }),
+  setSettings: (settings) => set({ settings }),
   setBackendHealth: (backendHealth) => set({ backendHealth }),
+  setError: (error) => set({ error }),
 }));

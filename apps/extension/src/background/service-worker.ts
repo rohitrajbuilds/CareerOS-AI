@@ -1,4 +1,5 @@
 import { registerAlarmHandlers, scheduleBackgroundAlarms } from './alarms';
+import { registerLifecycleHandlers } from './lifecycle';
 import { registerMessageRouter } from './router';
 
 chrome.runtime.onInstalled.addListener(() => {
@@ -10,4 +11,5 @@ chrome.runtime.onStartup.addListener(() => {
 });
 
 registerAlarmHandlers();
+registerLifecycleHandlers();
 registerMessageRouter();
