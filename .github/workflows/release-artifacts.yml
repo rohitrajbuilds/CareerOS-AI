@@ -48,7 +48,7 @@ jobs:
           zip -r ../../../careeros-extension.zip .
 
       - name: Build backend image
-        run: docker build -f apps/backend/Dockerfile -t careeros-backend:${{ github.sha }} .
+        run: docker build -f apps/backend/Dockerfile -t careeros-backend:${{ github.sha }} apps/backend
 
       - name: Save backend image tarball
         run: docker save careeros-backend:${{ github.sha }} -o careeros-backend.tar

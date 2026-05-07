@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CareerOS AI Permissions</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <section class="hero">
+        <p class="eyebrow">CareerOS AI</p>
+        <h1>Permissions Explanation</h1>
+        <p>
+          This page explains why the extension requests each Chrome permission and supported host
+          access pattern.
+        </p>
+      </section>
+
+      <section class="grid">
+        <article class="card">
+          <h2>Chrome API permissions</h2>
+          <ul class="list">
+            <li><strong>storage</strong>: saves user settings, profile state, and encrypted local records.</li>
+            <li><strong>tabs</strong>: identifies the active tab and supported application pages.</li>
+            <li><strong>alarms</strong>: schedules background refresh and lifecycle-safe maintenance tasks.</li>
+            <li><strong>sidePanel</strong>: opens the main workspace experience inside Chrome.</li>
+            <li><strong>scripting</strong>: injects content scripts into supported job application sites.</li>
+            <li><strong>activeTab</strong>: performs user-initiated actions against the current tab without broader permanent access.</li>
+          </ul>
+        </article>
+
+        <article class="card">
+          <h2>Host permissions</h2>
+          <p>
+            CareerOS AI only requests host access for supported job application providers and local
+            development APIs:
+          </p>
+          <ul class="list">
+            <li>Workday and MyWorkdayJobs</li>
+            <li>LinkedIn</li>
+            <li>Greenhouse</li>
+            <li>Lever</li>
+            <li>Localhost backend during development</li>
+          </ul>
+          <p>
+            Host access is used to detect job forms, read field context, inject content scripts, and
+            fill fields after the user activates the extension workflow.
+          </p>
+        </article>
+      </section>
+    </main>
+  </body>
+  </html>

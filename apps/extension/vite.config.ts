@@ -1,12 +1,41 @@
+import { readFileSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
-import { defineConfig } from 'vite';
+import { defineConfig, type Plugin } from 'vite';
 import react from '@vitejs/plugin-react';
 
 const root = resolve(__dirname, 'src');
+const publicDir = resolve(__dirname, 'public');
+const manifestPath = resolve(publicDir, 'manifest.json');
 
-export default defineConfig({
-  plugins: [react()],
-  publicDir: resolve(__dirname, 'public'),
+function manifestTransformPlugin(mode: string): Plugin {
+  return {
+    name: 'careeros-manifest-transform',
+    apply: 'build',
+    writeBundle(outputOptions) {
+      const outputDir = outputOptions.dir;
+      if (!outputDir) {
+        return;
+      }
+
+      const manifest = JSON.parse(readFileSync(manifestPath, 'utf-8')) as {
+        host_permissions?: string[];
+      };
+
+      if (mode === 'production') {
+        manifest.host_permissions = (manifest.host_permissions ?? []).filter(
+          (pattern) => !pattern.includes('localhost'),
+        );
+      }
+
+      const targetPath = resolve(outputDir, 'manifest.json');
+      writeFileSync(targetPath, `${JSON.stringify(manifest, null, 2)}\n`, 'utf-8');
+    },
+  };
+}
+
+export default defineConfig(({ mode }) => ({
+  plugins: [react(), manifestTransformPlugin(mode)],
+  publicDir,
   resolve: {
     alias: {
       '@': root,
@@ -42,4 +71,4 @@ export default defineConfig({
       },
     },
   },
-});
+}));

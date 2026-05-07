@@ -28,3 +28,5 @@ apps/extension/dist/
 coverage/
 tmp/
 *.log
+.vercel/
+.railway/

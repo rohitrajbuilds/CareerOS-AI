@@ -6,6 +6,7 @@
   "scripts": {
     "dev:extension": "pnpm --filter @careeros/extension dev",
     "build:extension": "pnpm --filter @careeros/extension build",
+    "build:legal-site": "echo \"Static legal site requires no build step\"",
     "build": "pnpm build:extension",
     "lint:extension": "pnpm --filter @careeros/extension lint",
     "lint:backend": "python -m ruff check apps/backend/app apps/backend/tests",
@@ -18,7 +19,8 @@
     "backend:test": "python -m pytest apps/backend/tests",
     "lint": "pnpm lint:extension && pnpm lint:backend",
     "format": "prettier . --write && pnpm format:backend",
-    "format:check": "prettier . --check && pnpm format:backend:check"
+    "format:check": "prettier . --check && pnpm format:backend:check",
+    "package:extension": "pnpm build:extension"
   },
   "devDependencies": {
     "@playwright/test": "^1.54.2",
