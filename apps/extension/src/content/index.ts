@@ -5,12 +5,16 @@ import type {
   SiteContextDetectedMessage,
 } from '@/lib/schema/messages';
 import { MessageType } from '@/lib/schema/message-types';
+import { AiAssistantOverlay } from './ai/assistant-overlay';
+import { AiGenerateButtonManager } from './ai/generate-buttons';
 import { observeDocument } from './core/dom-observer';
 import { getPageState } from './core/page-state';
 import { registerContentMessageHandlers } from './runtime';
 
 let hasBootstrapped = false;
 let changeNotificationTimer: number | null = null;
+const assistantOverlay = new AiAssistantOverlay();
+const buttonManager = new AiGenerateButtonManager(assistantOverlay);
 
 async function notifyPageState(): Promise<void> {
   const pageState = getPageState();
@@ -67,9 +71,11 @@ async function bootstrapContentScript(): Promise<void> {
   } satisfies ContentReadyMessage);
 
   await notifyPageState();
+  buttonManager.attachButtons();
 
   observeDocument(() => {
     schedulePageStateNotification();
+    buttonManager.attachButtons();
   });
   registerDynamicRescanTriggers();
 }

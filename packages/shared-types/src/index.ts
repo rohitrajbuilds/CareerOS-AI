@@ -129,6 +129,7 @@ export type ResumeAsset = {
   updatedAt: string;
   tags: string[];
   isPrimary: boolean;
+  textPreview?: string | null;
   encryptedBlob: string;
 };
 
@@ -188,3 +189,60 @@ export type RuntimeResult<TData> = {
   ok: false;
   error: ExtensionMessageError;
 };
+
+export type AiResponseType =
+  | 'cover_letter'
+  | 'why_company'
+  | 'short_answer'
+  | 'experience_summary'
+  | 'technical_answer';
+
+export type JobPageContext = {
+  provider: ATSProvider;
+  url: string;
+  companyName?: string;
+  roleTitle?: string;
+  questionLabel?: string;
+  jobDescription?: string;
+  nearbyText?: string[];
+};
+
+export type ResumeContext = {
+  primaryResumeFileName?: string;
+  primaryResumeTags?: string[];
+  profileSummary: string;
+  resumeText?: string;
+};
+
+export type AiGenerationRequest = {
+  type: AiResponseType;
+  promptHint?: string;
+  profile: UserProfile;
+  resumeContext: ResumeContext;
+  jobContext: JobPageContext;
+  maxOutputTokens?: number;
+};
+
+export type AiStreamEvent =
+  | {
+      type: 'started';
+      requestType: AiResponseType;
+      model: string;
+    }
+  | {
+      type: 'delta';
+      text: string;
+    }
+  | {
+      type: 'completed';
+      text: string;
+      usage?: {
+        inputTokens?: number;
+        outputTokens?: number;
+      };
+    }
+  | {
+      type: 'error';
+      message: string;
+      retryable: boolean;
+    };

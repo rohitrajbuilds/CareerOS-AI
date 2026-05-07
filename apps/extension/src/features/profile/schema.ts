@@ -58,6 +58,7 @@ export const resumeAssetSchema = z.object({
   updatedAt: z.string().min(1),
   tags: z.array(z.string().min(1)).default([]),
   isPrimary: z.boolean(),
+  textPreview: z.string().nullable().optional(),
   encryptedBlob: z.string().min(1),
 });
 

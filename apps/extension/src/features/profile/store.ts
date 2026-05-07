@@ -159,6 +159,10 @@ export const useProfileStore = create<ProfileStoreState>((set, get) => ({
       const resumes: ResumeAsset[] = await Promise.all(
         files.map(async (file, index) => {
           const fileBase64 = await fileToBase64(file);
+          const textPreview =
+            file.type.startsWith('text/') || file.name.endsWith('.txt')
+              ? (await file.text()).slice(0, 12000)
+              : null;
           return {
             id: crypto.randomUUID(),
             fileName: file.name,
@@ -168,6 +172,7 @@ export const useProfileStore = create<ProfileStoreState>((set, get) => ({
             updatedAt: now,
             tags: [],
             isPrimary: current.resumes.length === 0 && index === 0,
+            textPreview,
             encryptedBlob: await encryptJson({
               fileName: file.name,
               mimeType: file.type || 'application/octet-stream',

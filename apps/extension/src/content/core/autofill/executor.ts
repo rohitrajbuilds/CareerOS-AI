@@ -1,4 +1,3 @@
-import type { AutofillResult } from '@careeros/shared-types';
 import { captureCurrentValue, selectValueLikeUser, setCheckboxLikeUser, setRadioLikeUser, typeLikeHuman } from './react-events';
 import { ensureDebugStyles, publishDebugState } from './debug-tools';
 import { resolveFieldElement } from './selector-resolver';
