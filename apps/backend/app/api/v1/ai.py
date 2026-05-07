@@ -3,8 +3,10 @@ from fastapi.responses import StreamingResponse
 
 from app.schemas.ai import AiGenerationRequest
 from app.schemas.agents import AgentDescriptor, AgentRunRequest, AgentRunResponse, AgentSessionResponse
+from app.schemas.company_research import CompanyResearchRequest, CompanyResearchResponse
 from app.services.ai.agent_orchestrator import get_agent_session, run_agent
 from app.services.ai.agent_registry import get_agent_registry
+from app.services.ai.company_research import build_company_research_response
 from app.services.ai.orchestrator import stream_ai_response
 
 router = APIRouter()
@@ -47,3 +49,8 @@ async def list_ai_agents() -> list[AgentDescriptor]:
 @router.get("/agents/sessions/{session_id}", response_model=AgentSessionResponse)
 async def get_ai_agent_session(session_id: str) -> AgentSessionResponse:
     return get_agent_session(session_id)
+
+
+@router.post("/company-research", response_model=CompanyResearchResponse)
+async def company_research(request: CompanyResearchRequest) -> CompanyResearchResponse:
+    return build_company_research_response(request)

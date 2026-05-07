@@ -1,3 +1,4 @@
+import { CompanyInsightsCard } from '@/features/company-research/components/company-insights-card';
 import { AnalysisDashboard } from '@/features/job-analysis/components/analysis-dashboard';
 import { ProfileSummaryCard } from '@/features/profile/components/profile-summary';
 import { useExtensionActions } from '@/lib/hooks/use-extension-core';
@@ -25,6 +26,9 @@ export function HomeRoute(): JSX.Element {
     <section className="grid gap-4 md:grid-cols-2">
       <div className="md:col-span-2">
         <AnalysisDashboard />
+      </div>
+      <div className="md:col-span-2">
+        <CompanyInsightsCard />
       </div>
       <article className="rounded-[var(--radius-card)] border border-[var(--color-border)] bg-[var(--color-surface)] p-5 shadow-sm">
         <h2 className="text-lg font-semibold">Extension Status</h2>

@@ -1,4 +1,5 @@
 import type {
+  CompanyResearchResponse,
   ExtensionSettings,
   ExtensionSnapshot,
   HealthResponse,
@@ -13,6 +14,9 @@ type ExtensionState = {
   jobAnalysis: JobAnalysisResponse | null;
   jobAnalysisLoading: boolean;
   jobAnalysisError: string | null;
+  companyResearch: CompanyResearchResponse | null;
+  companyResearchLoading: boolean;
+  companyResearchError: string | null;
   error: string | null;
   setSnapshot: (snapshot: ExtensionSnapshot | null) => void;
   setSettings: (settings: ExtensionSettings | null) => void;
@@ -20,6 +24,9 @@ type ExtensionState = {
   setJobAnalysis: (analysis: JobAnalysisResponse | null) => void;
   setJobAnalysisLoading: (loading: boolean) => void;
   setJobAnalysisError: (error: string | null) => void;
+  setCompanyResearch: (research: CompanyResearchResponse | null) => void;
+  setCompanyResearchLoading: (loading: boolean) => void;
+  setCompanyResearchError: (error: string | null) => void;
   setError: (error: string | null) => void;
 };
 
@@ -30,6 +37,9 @@ export const useExtensionStore = create<ExtensionState>((set) => ({
   jobAnalysis: null,
   jobAnalysisLoading: false,
   jobAnalysisError: null,
+  companyResearch: null,
+  companyResearchLoading: false,
+  companyResearchError: null,
   error: null,
   setSnapshot: (snapshot) => set({ snapshot }),
   setSettings: (settings) => set({ settings }),
@@ -37,5 +47,8 @@ export const useExtensionStore = create<ExtensionState>((set) => ({
   setJobAnalysis: (jobAnalysis) => set({ jobAnalysis }),
   setJobAnalysisLoading: (jobAnalysisLoading) => set({ jobAnalysisLoading }),
   setJobAnalysisError: (jobAnalysisError) => set({ jobAnalysisError }),
+  setCompanyResearch: (companyResearch) => set({ companyResearch }),
+  setCompanyResearchLoading: (companyResearchLoading) => set({ companyResearchLoading }),
+  setCompanyResearchError: (companyResearchError) => set({ companyResearchError }),
   setError: (error) => set({ error }),
 }));

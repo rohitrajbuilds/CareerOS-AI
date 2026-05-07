@@ -23,12 +23,14 @@ class CompanyResearchAgent(BaseAgent):
     ) -> PromptBundle:
         system_prompt = (
             "You are CareerOS Company Research Agent. Synthesize provided company context into useful "
-            "application positioning. Never claim you verified facts beyond the supplied context."
+            "application positioning. Never claim you verified facts beyond the supplied context. "
+            "Return strict JSON only with this shape: "
+            '{"summary":"","mission":"","techStack":[],"cultureSignals":[],"companyInsights":[],"interviewPrep":[{"question":"","rationale":"","talkingPoints":[]}],"tailoredMotivationAnswers":{"whyThisCompany":"","whyThisRole":"","valueAlignment":""}}'
         )
         user_prompt = join_sections(
             [
                 "Task: summarize the most relevant company signals for the candidate's application.",
-                "Highlight mission, product, likely team priorities, and talking points the candidate can use.",
+                "Highlight mission, likely product and engineering context, probable tech stack, culture signals, interview prep, and tailored motivation answers.",
                 build_candidate_context(context),
                 build_job_context(context),
                 build_memory_context(memory),

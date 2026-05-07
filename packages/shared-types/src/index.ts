@@ -318,3 +318,36 @@ export type JobAnalysisResponse = {
   aiInsights: JobAnalysisInsight;
   jobContext: JobPageContext;
 };
+
+export type CompanyInterviewPrepItem = {
+  question: string;
+  rationale: string;
+  talkingPoints: string[];
+};
+
+export type TailoredMotivationAnswers = {
+  whyThisCompany: string;
+  whyThisRole: string;
+  valueAlignment: string;
+};
+
+export type CompanyResearchRequest = {
+  sessionId?: string;
+  profile: UserProfile;
+  resumeContext: ResumeContext;
+  jobContext: JobPageContext;
+};
+
+export type CompanyResearchResponse = {
+  analyzedAt: string;
+  sessionId?: string;
+  companyName: string;
+  summary: string;
+  mission: string;
+  techStack: string[];
+  cultureSignals: string[];
+  companyInsights: string[];
+  interviewPrep: CompanyInterviewPrepItem[];
+  tailoredMotivationAnswers: TailoredMotivationAnswers;
+  generated: boolean;
+};
