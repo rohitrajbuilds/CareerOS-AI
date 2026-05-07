@@ -1,3 +1,4 @@
+import { ProfileSummaryCard } from '@/features/profile/components/profile-summary';
 import { useExtensionActions } from '@/lib/hooks/use-extension-core';
 import { useExtensionStore } from '../store/use-extension-store';
 
@@ -94,6 +95,9 @@ export function HomeRoute(): JSX.Element {
           </label>
         </div>
       </article>
+      <div className="md:col-span-2">
+        <ProfileSummaryCard />
+      </div>
     </section>
   );
 }

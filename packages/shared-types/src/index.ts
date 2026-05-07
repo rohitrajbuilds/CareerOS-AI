@@ -35,6 +35,70 @@ export type ExtensionSettings = {
   debugMode: boolean;
 };
 
+export type SponsorshipStatus =
+  | 'citizen'
+  | 'permanent_resident'
+  | 'visa_sponsorship_required'
+  | 'student_visa'
+  | 'other';
+
+export type EducationEntry = {
+  id: string;
+  institution: string;
+  degree: string;
+  fieldOfStudy: string;
+  startDate?: string;
+  endDate?: string;
+  description?: string;
+};
+
+export type WorkExperienceEntry = {
+  id: string;
+  company: string;
+  title: string;
+  startDate?: string;
+  endDate?: string;
+  location?: string;
+  summary?: string;
+};
+
+export type ResumeAsset = {
+  id: string;
+  fileName: string;
+  mimeType: string;
+  sizeBytes: number;
+  uploadedAt: string;
+  updatedAt: string;
+  tags: string[];
+  isPrimary: boolean;
+  encryptedBlob: string;
+};
+
+export type UserProfile = {
+  fullName: string;
+  email: string;
+  phone: string;
+  linkedInUrl: string;
+  githubUrl: string;
+  portfolioUrl: string;
+  sponsorshipStatus: SponsorshipStatus;
+  education: EducationEntry[];
+  workExperience: WorkExperienceEntry[];
+};
+
+export type UserProfileRecord = {
+  profile: UserProfile;
+  resumes: ResumeAsset[];
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type ProfileCompletion = {
+  completedFields: number;
+  totalFields: number;
+  percentage: number;
+};
+
 export type TabSession = {
   tabId: number;
   windowId?: number;
