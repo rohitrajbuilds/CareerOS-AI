@@ -1,0 +1,62 @@
+name: Release Artifacts
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build-artifacts:
+    name: Build Release Artifacts
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9.12.0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install frontend dependencies
+        run: pnpm install --no-frozen-lockfile
+
+      - name: Install backend dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e "./apps/backend[dev]"
+
+      - name: Build extension
+        run: pnpm build
+
+      - name: Archive extension package
+        run: |
+          cd apps/extension/dist
+          zip -r ../../../careeros-extension.zip .
+
+      - name: Build backend image
+        run: docker build -f apps/backend/Dockerfile -t careeros-backend:${{ github.sha }} .
+
+      - name: Save backend image tarball
+        run: docker save careeros-backend:${{ github.sha }} -o careeros-backend.tar
+
+      - name: Upload release artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: careeros-release-artifacts
+          path: |
+            careeros-extension.zip
+            careeros-backend.tar

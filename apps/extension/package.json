@@ -7,7 +7,8 @@
     "dev": "vite build --watch --mode development",
     "build": "vite build",
     "lint": "eslint src --ext .ts,.tsx",
-    "typecheck": "tsc --project tsconfig.json"
+    "typecheck": "tsc --project tsconfig.json",
+    "test:unit": "vitest run --config vitest.config.ts"
   },
   "dependencies": {
     "@careeros/shared-config": "workspace:*",
@@ -22,14 +23,18 @@
     "zustand": "^5.0.4"
   },
   "devDependencies": {
+    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/react": "^16.3.0",
     "@tailwindcss/postcss": "^4.1.5",
     "@types/chrome": "^0.0.322",
     "@types/react": "^19.1.2",
     "@types/react-dom": "^19.1.2",
     "@vitejs/plugin-react": "^4.4.1",
     "autoprefixer": "^10.4.21",
+    "jsdom": "^26.1.0",
     "postcss": "^8.5.3",
     "tailwindcss": "^4.1.5",
-    "vite": "^6.3.5"
+    "vite": "^6.3.5",
+    "vitest": "^3.2.4"
   }
 }

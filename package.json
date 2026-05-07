@@ -6,14 +6,22 @@
   "scripts": {
     "dev:extension": "pnpm --filter @careeros/extension dev",
     "build:extension": "pnpm --filter @careeros/extension build",
+    "build": "pnpm build:extension",
     "lint:extension": "pnpm --filter @careeros/extension lint",
+    "lint:backend": "python -m ruff check apps/backend/app apps/backend/tests",
+    "format:backend": "python -m ruff format apps/backend/app apps/backend/tests",
+    "format:backend:check": "python -m ruff format --check apps/backend/app apps/backend/tests",
     "typecheck:extension": "pnpm --filter @careeros/extension typecheck",
+    "test:backend": "python -m pytest apps/backend/tests --cov=app --cov-report=term-missing",
+    "test:unit": "pnpm --filter @careeros/extension test:unit",
+    "test:e2e": "playwright test",
     "backend:test": "python -m pytest apps/backend/tests",
-    "lint": "pnpm lint:extension",
-    "format": "prettier . --write",
-    "format:check": "prettier . --check"
+    "lint": "pnpm lint:extension && pnpm lint:backend",
+    "format": "prettier . --write && pnpm format:backend",
+    "format:check": "prettier . --check && pnpm format:backend:check"
   },
   "devDependencies": {
+    "@playwright/test": "^1.54.2",
     "@eslint/js": "^9.26.0",
     "eslint": "^9.26.0",
     "eslint-plugin-react-hooks": "^5.2.0",
