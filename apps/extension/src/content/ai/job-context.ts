@@ -31,12 +31,8 @@ function inferResponseType(questionText: string): AiResponseType {
   return 'short_answer';
 }
 
-export function buildJobContextForField(textarea: HTMLTextAreaElement): {
-  jobContext: JobPageContext;
-  inferredType: AiResponseType;
-} {
+function getProviderSelectors(): { title: string[]; company: string[]; description: string[] } {
   const siteContext = getSiteContext();
-  const fieldContext = buildFieldCandidateContext(textarea);
   const providerSelectors: Record<string, { title: string[]; company: string[]; description: string[] }> = {
     workday: {
       title: ['[data-automation-id="jobPostingHeader"] h2', '[data-automation-id="jobPostingHeader"]'],
@@ -65,26 +61,42 @@ export function buildJobContextForField(textarea: HTMLTextAreaElement): {
     },
   };
 
-  const selectors = providerSelectors[siteContext.provider] ?? providerSelectors.unknown;
+  return providerSelectors[siteContext.provider] ?? providerSelectors.unknown;
+}
+
+export function buildJobPageContext(questionLabelHint?: string): JobPageContext {
+  const siteContext = getSiteContext();
+  const selectors = getProviderSelectors();
+  const description =
+    textFromSelectors(selectors.description) || normalizeText(document.body.innerText).slice(0, 12000);
+
+  return {
+    provider: siteContext.provider,
+    url: siteContext.url,
+    companyName: textFromSelectors(selectors.company) || undefined,
+    roleTitle: textFromSelectors(selectors.title) || siteContext.title,
+    questionLabel: normalizeText(questionLabelHint) || undefined,
+    jobDescription: description.slice(0, 12000),
+    nearbyText: [],
+  };
+}
+
+export function buildJobContextForField(textarea: HTMLTextAreaElement): {
+  jobContext: JobPageContext;
+  inferredType: AiResponseType;
+} {
+  const fieldContext = buildFieldCandidateContext(textarea);
   const questionLabel = normalizeText(
     [fieldContext.label, fieldContext.ariaLabel, textarea.placeholder, ...fieldContext.nearbyText]
       .filter(Boolean)
       .join(' '),
   );
-  const description = textFromSelectors(selectors.description) || normalizeText(document.body.innerText).slice(0, 12000);
-
-  const jobContext: JobPageContext = {
-    provider: siteContext.provider,
-    url: siteContext.url,
-    companyName: textFromSelectors(selectors.company) || undefined,
-    roleTitle: textFromSelectors(selectors.title) || siteContext.title,
-    questionLabel: questionLabel || undefined,
-    jobDescription: description.slice(0, 12000),
-    nearbyText: fieldContext.nearbyText.slice(0, 12),
-  };
+  const jobContext = buildJobPageContext(questionLabel);
+  jobContext.nearbyText = fieldContext.nearbyText.slice(0, 12);
+  const inferenceSource = questionLabel || jobContext.jobDescription?.slice(0, 300) || '';
 
   return {
     jobContext,
-    inferredType: inferResponseType(questionLabel || description.slice(0, 300)),
+    inferredType: inferResponseType(inferenceSource),
   };
 }

@@ -3,6 +3,7 @@ import type {
   AutofillResponse,
   AutofillFormMessage,
   ExtensionSnapshotResponse,
+  JobAnalysisContextRuntimeResponse,
   PageStateRuntimeResponse,
   SettingsResponse,
   TabSessionResponse,
@@ -115,6 +116,15 @@ export async function requestPageStateForTab(
   }
 
   return createSuccessResult({ fieldCount: response.data.fields.length });
+}
+
+export async function requestJobAnalysisContextForTab(
+  tabId: number,
+): Promise<JobAnalysisContextRuntimeResponse> {
+  await ensureContentScriptInjected(tabId);
+  return sendTabMessage<JobAnalysisContextRuntimeResponse>(tabId, {
+    type: MessageType.RequestJobAnalysisContext,
+  });
 }
 
 export async function triggerAutofillForTab(

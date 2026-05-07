@@ -10,8 +10,8 @@ export function Shell({ children }: PropsWithChildren): JSX.Element {
           </p>
           <h1 className="mt-2 text-3xl font-semibold">Application Copilot Workspace</h1>
           <p className="mt-2 max-w-2xl text-sm text-[var(--color-text-muted)]">
-            This scaffold wires the extension shell, messaging, backend connectivity, and UI
-            surfaces without product features yet.
+            Analyze job fit, tailor your application assets, and keep your browser-side job search
+            workflow connected to a typed backend intelligence layer.
           </p>
         </header>
         {children}

@@ -2,6 +2,7 @@ import type {
   ExtensionSettings,
   ExtensionSnapshot,
   HealthResponse,
+  JobPageContext,
   RuntimeResult,
 } from '@careeros/shared-types';
 import { useCallback } from 'react';
@@ -12,6 +13,7 @@ import {
 } from '@/lib/message-bus/runtime';
 import type {
   ExtensionSnapshotResponse,
+  JobAnalysisContextRuntimeResponse,
   OpenSidePanelResponse,
   SettingsResponse,
   UpdateSettingsResponse,
@@ -77,9 +79,22 @@ export function useExtensionActions() {
     [],
   );
 
+  const getCurrentJobContext = useCallback(
+    async (): Promise<JobPageContext> => {
+      const response = await unwrapRuntimeResult(
+        sendRuntimeMessage<JobAnalysisContextRuntimeResponse>({
+          type: MessageType.RequestJobAnalysisContext,
+        }),
+      );
+      return response.jobContext;
+    },
+    [],
+  );
+
   return {
     openSidePanel,
     refreshActiveTab,
     updateSettings,
+    getCurrentJobContext,
   };
 }

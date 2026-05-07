@@ -1,5 +1,6 @@
 import type {
   AutofillResponse,
+  JobAnalysisContextRuntimeResponse,
   PageStateResponseMessage,
   PageStateRuntimeResponse,
   PingResponse,
@@ -7,6 +8,7 @@ import type {
 } from '@/lib/schema/messages';
 import { addRuntimeMessageListener, createSuccessResult } from '@/lib/message-bus/runtime';
 import { MessageType } from '@/lib/schema/message-types';
+import { buildJobPageContext } from './ai/job-context';
 import { autofillKnownFields } from './core/autofill-engine';
 import { getPageState } from './core/page-state';
 
@@ -17,6 +19,10 @@ export function registerContentMessageHandlers(): void {
         return createSuccessResult({ pong: true, surface: 'content' }) satisfies PingResponse;
       case MessageType.RequestPageState:
         return createSuccessResult(getPageState()) satisfies PageStateRuntimeResponse;
+      case MessageType.RequestJobAnalysisContext:
+        return createSuccessResult({
+          jobContext: buildJobPageContext(),
+        }) satisfies JobAnalysisContextRuntimeResponse;
       case MessageType.AutofillForm:
         return autofillKnownFields({
           provider: message.payload.provider,

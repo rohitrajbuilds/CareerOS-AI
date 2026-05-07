@@ -6,6 +6,7 @@ import type {
   ExtensionSettings,
   ExtensionSnapshot,
   FormField,
+  JobPageContext,
   RuntimeResult,
   SiteContext,
   TabSession,
@@ -72,6 +73,17 @@ export type PageStateResponseMessage = {
   };
 };
 
+export type RequestJobAnalysisContextMessage = {
+  type: typeof MessageType.RequestJobAnalysisContext;
+};
+
+export type JobAnalysisContextResponseMessage = {
+  type: typeof MessageType.JobAnalysisContextResponse;
+  payload: {
+    jobContext: JobPageContext;
+  };
+};
+
 export type AnalyzeFormMessage = {
   type: typeof MessageType.AnalyzeForm;
   payload: {
@@ -113,7 +125,9 @@ export type RuntimeMessage =
   | SiteContextDetectedMessage
   | ContentReadyMessage
   | RequestPageStateMessage
+  | RequestJobAnalysisContextMessage
   | PageStateResponseMessage
+  | JobAnalysisContextResponseMessage
   | AnalyzeFormMessage
   | AutofillFormMessage
   | AutofillResultMessage
@@ -140,4 +154,7 @@ export type AutofillResponse = RuntimeResult<{
 export type PageStateRuntimeResponse = RuntimeResult<{
   siteContext: SiteContext;
   fields: FormField[];
+}>;
+export type JobAnalysisContextRuntimeResponse = RuntimeResult<{
+  jobContext: JobPageContext;
 }>;

@@ -246,3 +246,75 @@ export type AiStreamEvent =
       message: string;
       retryable: boolean;
     };
+
+export type RequirementCategory =
+  | 'skills'
+  | 'experience'
+  | 'education'
+  | 'responsibility'
+  | 'domain'
+  | 'other';
+
+export type RequirementMatchSource = 'resume' | 'profile' | 'job_context' | 'unmatched';
+
+export type JobRequirement = {
+  id: string;
+  text: string;
+  category: RequirementCategory;
+  matched: boolean;
+  confidence: number;
+  matchSource: RequirementMatchSource;
+};
+
+export type JobSkillSignal = {
+  name: string;
+  normalizedName: string;
+  required: boolean;
+  matched: boolean;
+  weight: number;
+};
+
+export type JobAnalysisBreakdown = {
+  skillCoverage: number;
+  requirementCoverage: number;
+  keywordAlignment: number;
+  experienceAlignment: number;
+  educationAlignment: number;
+};
+
+export type JobAnalysisRecommendation = {
+  id: string;
+  title: string;
+  detail: string;
+  priority: 'high' | 'medium' | 'low';
+  kind: 'missing_skill' | 'keyword' | 'experience' | 'education' | 'general';
+};
+
+export type JobAnalysisInsight = {
+  generated: boolean;
+  summary: string;
+  strengths: string[];
+  risks: string[];
+  nextSteps: string[];
+};
+
+export type JobAnalysisRequest = {
+  profile: UserProfile;
+  resumeContext: ResumeContext;
+  jobContext: JobPageContext;
+};
+
+export type JobAnalysisResponse = {
+  analyzedAt: string;
+  atsScore: number;
+  matchScore: number;
+  matchIndicator: 'strong' | 'moderate' | 'weak';
+  requirements: JobRequirement[];
+  detectedSkills: JobSkillSignal[];
+  matchedSkills: string[];
+  missingSkills: string[];
+  breakdown: JobAnalysisBreakdown;
+  recommendations: JobAnalysisRecommendation[];
+  aiInsights: JobAnalysisInsight;
+  jobContext: JobPageContext;
+};

@@ -1,3 +1,4 @@
+import { AnalysisDashboard } from '@/features/job-analysis/components/analysis-dashboard';
 import { ProfileSummaryCard } from '@/features/profile/components/profile-summary';
 import { useExtensionActions } from '@/lib/hooks/use-extension-core';
 import { useExtensionStore } from '../store/use-extension-store';
@@ -22,6 +23,9 @@ export function HomeRoute(): JSX.Element {
 
   return (
     <section className="grid gap-4 md:grid-cols-2">
+      <div className="md:col-span-2">
+        <AnalysisDashboard />
+      </div>
       <article className="rounded-[var(--radius-card)] border border-[var(--color-border)] bg-[var(--color-surface)] p-5 shadow-sm">
         <h2 className="text-lg font-semibold">Extension Status</h2>
         <dl className="mt-3 space-y-2 text-sm text-[var(--color-text-muted)]">

@@ -10,6 +10,7 @@ import {
   getTabSessionResponse,
   handleContentReady,
   requestPageStateForTab,
+  requestJobAnalysisContextForTab,
   resolveTargetTabId,
   triggerAutofillForTab,
   updateSettingsResponse,
@@ -59,6 +60,8 @@ async function handleMessage(
       return handleContentReady(sender, message.payload.href);
     case MessageType.RequestPageState:
       return createErrorResult('unsupported_direction', 'Background cannot answer page state requests');
+    case MessageType.RequestJobAnalysisContext:
+      return requestJobAnalysisContextForTab(await resolveTargetTabId(sender));
     case MessageType.PageStateResponse:
       return createSuccessResult({ accepted: true });
     case MessageType.BackendHealthCheck:
