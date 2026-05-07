@@ -66,7 +66,7 @@ async function handleMessage(
     case MessageType.AnalyzeForm:
       return requestPageStateForTab(await resolveTargetTabId(sender));
     case MessageType.AutofillForm:
-      return triggerAutofillForTab(await resolveTargetTabId(sender));
+      return triggerAutofillForTab(await resolveTargetTabId(sender), message.payload);
     case MessageType.AutofillResult:
       return createSuccessResult(message.payload);
     default:

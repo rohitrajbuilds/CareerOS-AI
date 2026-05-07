@@ -43,6 +43,42 @@ export type FormField = {
 export type AutofillResult = {
   filledCount: number;
   unresolved: string[];
+  previewCount?: number;
+  undoCount?: number;
+  skippedCount?: number;
+  failedCount?: number;
+  operation?: 'fill' | 'preview' | 'undo';
+};
+
+export type AutofillMode = 'fill' | 'preview' | 'undo';
+
+export type AutofillActionType =
+  | 'type'
+  | 'select'
+  | 'checkbox'
+  | 'radio'
+  | 'file'
+  | 'skip';
+
+export type AutofillAction = {
+  fieldId: string;
+  selector: string;
+  label: string;
+  type: FieldType;
+  actionType: AutofillActionType;
+  confidence: number;
+  value: string | boolean | null;
+  valueLabel?: string;
+  reason?: string;
+};
+
+export type AutofillDebugEntry = {
+  fieldId: string;
+  label: string;
+  selector: string;
+  status: 'planned' | 'previewed' | 'filled' | 'skipped' | 'failed' | 'undone';
+  message: string;
+  confidence: number;
 };
 
 export type HealthResponse = {

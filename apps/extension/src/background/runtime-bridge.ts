@@ -1,6 +1,7 @@
 import type {
   AnalyzeFormResponse,
   AutofillResponse,
+  AutofillFormMessage,
   ExtensionSnapshotResponse,
   PageStateRuntimeResponse,
   SettingsResponse,
@@ -116,12 +117,19 @@ export async function requestPageStateForTab(
   return createSuccessResult({ fieldCount: response.data.fields.length });
 }
 
-export async function triggerAutofillForTab(tabId: number): Promise<AutofillResponse> {
+export async function triggerAutofillForTab(
+  tabId: number,
+  payload: AutofillFormMessage['payload'],
+): Promise<AutofillResponse> {
   await ensureContentScriptInjected(tabId);
+  const siteContext = await getSiteContext(tabId);
   const response = await sendTabMessage<AutofillResponse>(tabId, {
     type: MessageType.AutofillForm,
     payload: {
-      provider: 'unknown',
+      provider: siteContext?.provider ?? payload.provider,
+      mode: payload.mode,
+      safeMode: payload.safeMode,
+      debug: payload.debug,
     },
   });
 

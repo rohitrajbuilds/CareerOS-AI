@@ -5,7 +5,6 @@ import type {
   SiteContextDetectedMessage,
 } from '@/lib/schema/messages';
 import { MessageType } from '@/lib/schema/message-types';
-import { autofillKnownFields } from './core/autofill-engine';
 import { observeDocument } from './core/dom-observer';
 import { getPageState } from './core/page-state';
 import { registerContentMessageHandlers } from './runtime';
@@ -73,8 +72,6 @@ async function bootstrapContentScript(): Promise<void> {
     schedulePageStateNotification();
   });
   registerDynamicRescanTriggers();
-
-  void autofillKnownFields();
 }
 
 void bootstrapContentScript();

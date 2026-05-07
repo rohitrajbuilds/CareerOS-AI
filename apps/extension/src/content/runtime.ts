@@ -18,7 +18,12 @@ export function registerContentMessageHandlers(): void {
       case MessageType.RequestPageState:
         return createSuccessResult(getPageState()) satisfies PageStateRuntimeResponse;
       case MessageType.AutofillForm:
-        return createSuccessResult(autofillKnownFields()) satisfies AutofillResponse;
+        return autofillKnownFields({
+          provider: message.payload.provider,
+          mode: message.payload.mode ?? 'fill',
+          safeMode: message.payload.safeMode ?? true,
+          debug: message.payload.debug ?? false,
+        }) satisfies Promise<AutofillResponse>;
       default:
         return null;
     }

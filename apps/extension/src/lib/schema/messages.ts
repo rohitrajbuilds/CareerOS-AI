@@ -1,5 +1,8 @@
 import type {
   ATSProvider,
+  AutofillAction,
+  AutofillMode,
+  AutofillDebugEntry,
   ExtensionSettings,
   ExtensionSnapshot,
   FormField,
@@ -81,6 +84,9 @@ export type AutofillFormMessage = {
   type: typeof MessageType.AutofillForm;
   payload: {
     provider: ATSProvider;
+    mode?: AutofillMode;
+    safeMode?: boolean;
+    debug?: boolean;
   };
 };
 
@@ -120,7 +126,17 @@ export type UpdateSettingsResponse = RuntimeResult<ExtensionSettings>;
 export type OpenSidePanelResponse = RuntimeResult<{ opened: true }>;
 export type TabSessionResponse = RuntimeResult<TabSession | null>;
 export type AnalyzeFormResponse = RuntimeResult<{ fieldCount: number }>;
-export type AutofillResponse = RuntimeResult<{ filledCount: number; unresolved: string[] }>;
+export type AutofillResponse = RuntimeResult<{
+  filledCount: number;
+  unresolved: string[];
+  previewCount?: number;
+  undoCount?: number;
+  skippedCount?: number;
+  failedCount?: number;
+  operation?: AutofillMode;
+  actions?: AutofillAction[];
+  debugLog?: AutofillDebugEntry[];
+}>;
 export type PageStateRuntimeResponse = RuntimeResult<{
   siteContext: SiteContext;
   fields: FormField[];
