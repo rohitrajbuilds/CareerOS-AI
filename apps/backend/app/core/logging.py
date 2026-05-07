@@ -1,8 +1,33 @@
 import logging
+from logging.config import dictConfig
+
+from app.core.config import get_settings
 
 
 def configure_logging() -> None:
-    logging.basicConfig(
-        level=logging.INFO,
-        format="%(asctime)s %(levelname)s [%(name)s] %(message)s",
+    settings = get_settings()
+    dictConfig(
+        {
+            "version": 1,
+            "disable_existing_loggers": False,
+            "formatters": {
+                "default": {
+                    "format": "%(asctime)s %(levelname)s [%(name)s] %(message)s",
+                }
+            },
+            "handlers": {
+                "default": {
+                    "formatter": "default",
+                    "class": "logging.StreamHandler",
+                }
+            },
+            "root": {
+                "handlers": ["default"],
+                "level": settings.log_level.upper(),
+            },
+        }
     )
+
+
+def get_logger(name: str) -> logging.Logger:
+    return logging.getLogger(name)
