@@ -1,0 +1,47 @@
+{
+  "manifest_version": 3,
+  "name": "CareerOS AI",
+  "description": "AI job application copilot for autofill, application tracking, and resume intelligence.",
+  "version": "0.1.0",
+  "minimum_chrome_version": "116",
+  "permissions": ["storage", "tabs", "alarms", "sidePanel", "scripting", "activeTab"],
+  "host_permissions": [
+    "https://*.workday.com/*",
+    "https://*.myworkdayjobs.com/*",
+    "https://*.linkedin.com/*",
+    "https://*.greenhouse.io/*",
+    "https://*.lever.co/*",
+    "http://localhost:8000/*"
+  ],
+  "background": {
+    "service_worker": "background/service-worker.js",
+    "type": "module"
+  },
+  "action": {
+    "default_title": "CareerOS AI",
+    "default_popup": "popup.html"
+  },
+  "side_panel": {
+    "default_path": "sidepanel.html"
+  },
+  "options_page": "options.html",
+  "content_scripts": [
+    {
+      "matches": [
+        "https://*.workday.com/*",
+        "https://*.myworkdayjobs.com/*",
+        "https://*.linkedin.com/*",
+        "https://*.greenhouse.io/*",
+        "https://*.lever.co/*"
+      ],
+      "js": ["content/content.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": ["assets/*"],
+      "matches": ["<all_urls>"]
+    }
+  ]
+}

@@ -1,0 +1,8 @@
+node_modules
+dist
+build
+.turbo
+.vite
+.venv
+coverage
+apps/backend/migrations
