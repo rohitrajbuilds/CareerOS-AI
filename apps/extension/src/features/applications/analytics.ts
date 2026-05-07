@@ -3,15 +3,11 @@ import type {
   ApplicationRecord,
   ApplicationStatus,
 } from '@careeros/shared-types';
-
-const ALL_STATUSES: ApplicationStatus[] = [
-  'saved',
-  'applied',
-  'interviewing',
-  'offer',
-  'rejected',
-  'withdrawn',
-];
+import {
+  ACTIVE_APPLICATION_STATUSES,
+  APPLICATION_STATUSES,
+  RESPONSE_RECEIVED_APPLICATION_STATUSES,
+} from '@careeros/shared-types';
 
 function formatMonth(isoDate: string): string {
   const date = new Date(isoDate);
@@ -19,7 +15,7 @@ function formatMonth(isoDate: string): string {
 }
 
 export function buildApplicationAnalytics(applications: ApplicationRecord[]): ApplicationAnalytics {
-  const statusCounts = ALL_STATUSES.reduce<Record<ApplicationStatus, number>>(
+  const statusCounts = APPLICATION_STATUSES.reduce<Record<ApplicationStatus, number>>(
     (accumulator, status) => ({ ...accumulator, [status]: 0 }),
     {
       saved: 0,
@@ -45,11 +41,17 @@ export function buildApplicationAnalytics(applications: ApplicationRecord[]): Ap
   const interviewCount = statusCounts.interviewing + statusCounts.offer;
   const rejectionCount = statusCounts.rejected;
   const offerCount = statusCounts.offer;
-  const respondedCount = interviewCount + rejectionCount;
+  const respondedCount = RESPONSE_RECEIVED_APPLICATION_STATUSES.reduce(
+    (total, status) => total + statusCounts[status],
+    0,
+  );
 
   return {
     totalApplications,
-    activeApplications: statusCounts.saved + statusCounts.applied + statusCounts.interviewing,
+    activeApplications: ACTIVE_APPLICATION_STATUSES.reduce(
+      (total, status) => total + statusCounts[status],
+      0,
+    ),
     interviewCount,
     rejectionCount,
     offerCount,

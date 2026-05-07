@@ -1,4 +1,11 @@
 export type ATSProvider = 'workday' | 'linkedin' | 'greenhouse' | 'lever' | 'unknown';
+export const SUPPORTED_ATS_PROVIDERS: ATSProvider[] = [
+  'workday',
+  'linkedin',
+  'greenhouse',
+  'lever',
+  'unknown',
+];
 
 export type ExtensionSurface = 'popup' | 'sidepanel' | 'background' | 'content' | 'options';
 
@@ -85,6 +92,12 @@ export type HealthResponse = {
   status: 'ok';
   service: string;
   environment: string;
+};
+
+export type AsyncResourceState<TData> = {
+  data: TData | null;
+  error: string | null;
+  isLoading: boolean;
 };
 
 export type ExtensionSettings = {
@@ -197,6 +210,14 @@ export type AiResponseType =
   | 'short_answer'
   | 'experience_summary'
   | 'technical_answer';
+
+export const AI_RESPONSE_TYPES: AiResponseType[] = [
+  'cover_letter',
+  'why_company',
+  'short_answer',
+  'experience_summary',
+  'technical_answer',
+];
 
 export type JobPageContext = {
   provider: ATSProvider;
@@ -360,6 +381,27 @@ export type ApplicationStatus =
   | 'offer'
   | 'rejected'
   | 'withdrawn';
+
+export const APPLICATION_STATUSES: ApplicationStatus[] = [
+  'saved',
+  'applied',
+  'interviewing',
+  'offer',
+  'rejected',
+  'withdrawn',
+];
+
+export const ACTIVE_APPLICATION_STATUSES: ApplicationStatus[] = [
+  'saved',
+  'applied',
+  'interviewing',
+];
+
+export const RESPONSE_RECEIVED_APPLICATION_STATUSES: ApplicationStatus[] = [
+  'interviewing',
+  'offer',
+  'rejected',
+];
 
 export type ApplicationPriority = 'high' | 'medium' | 'low';
 

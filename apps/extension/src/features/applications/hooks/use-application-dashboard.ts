@@ -1,19 +1,23 @@
 import type { ApplicationPriority, ApplicationRecord, ApplicationStatus } from '@careeros/shared-types';
 import { useCallback, useEffect } from 'react';
 import { useExtensionActions } from '@/lib/hooks/use-extension-core';
+import { selectApplicationDashboard } from '@/sidepanel/store/selectors';
 import { useExtensionStore } from '@/sidepanel/store/use-extension-store';
 import { buildApplicationAnalytics } from '../analytics';
 import { downloadApplicationsCsv } from '../csv';
 import {
-  createApplicationFromJobContext,
+  updateApplicationRecord,
+  updateApplicationStatus,
+  upsertApplicationFromJobContext,
+} from '../domain';
+import {
   loadApplicationDashboardRecord,
   saveApplicationDashboardRecord,
-  updateApplicationStatus,
 } from '../storage';
 
 export function useApplicationDashboard() {
   const { getCurrentJobContext } = useExtensionActions();
-  const dashboard = useExtensionStore((state) => state.applicationDashboard);
+  const dashboard = useExtensionStore(selectApplicationDashboard);
   const setDashboard = useExtensionStore((state) => state.setApplicationDashboard);
   const setAnalytics = useExtensionStore((state) => state.setApplicationAnalytics);
   const setLoading = useExtensionStore((state) => state.setApplicationDashboardLoading);
@@ -68,35 +72,7 @@ export function useApplicationDashboard() {
         }
 
         const current = dashboard ?? (await loadApplicationDashboardRecord());
-        const duplicateIndex = current.applications.findIndex(
-          (application) =>
-            application.sourceUrl === jobContext.url ||
-            (application.companyName === (jobContext.companyName ?? '') &&
-              application.roleTitle === (jobContext.roleTitle ?? '')),
-        );
-
-        let nextApplications = [...current.applications];
-        if (duplicateIndex >= 0) {
-          const existing = nextApplications[duplicateIndex];
-          nextApplications[duplicateIndex] = {
-            ...existing,
-            sourcePlatform: jobContext.provider,
-            sourceUrl: jobContext.url,
-            updatedAt: new Date().toISOString(),
-            notes: options?.notes?.trim() || existing.notes,
-          };
-        } else {
-          nextApplications = [
-            createApplicationFromJobContext(jobContext, {
-              status: options?.status ?? 'applied',
-              priority: options?.priority ?? 'medium',
-              notes: options?.notes,
-            }),
-            ...nextApplications,
-          ];
-        }
-
-        await persistApplications(nextApplications);
+        await persistApplications(upsertApplicationFromJobContext(current, jobContext, options));
       } catch (error) {
         setError(error instanceof Error ? error.message : 'Failed to save current application');
       } finally {
@@ -110,8 +86,8 @@ export function useApplicationDashboard() {
     async (applicationId: string, status: ApplicationStatus): Promise<void> => {
       setError(null);
       const current = dashboard ?? (await loadApplicationDashboardRecord());
-      const nextApplications = current.applications.map((application) =>
-        application.id === applicationId ? updateApplicationStatus(application, status) : application,
+      const nextApplications = updateApplicationRecord(current, applicationId, (application) =>
+        updateApplicationStatus(application, status),
       );
       await persistApplications(nextApplications);
     },
@@ -121,15 +97,11 @@ export function useApplicationDashboard() {
   const updateApplicationNotes = useCallback(
     async (applicationId: string, notes: string): Promise<void> => {
       const current = dashboard ?? (await loadApplicationDashboardRecord());
-      const nextApplications = current.applications.map((application) =>
-        application.id === applicationId
-          ? {
-              ...application,
-              notes: notes.trim() || undefined,
-              updatedAt: new Date().toISOString(),
-            }
-          : application,
-      );
+      const nextApplications = updateApplicationRecord(current, applicationId, (application) => ({
+        ...application,
+        notes: notes.trim() || undefined,
+        updatedAt: new Date().toISOString(),
+      }));
       await persistApplications(nextApplications);
     },
     [dashboard, persistApplications],

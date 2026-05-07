@@ -20,7 +20,8 @@
     "lint": "pnpm lint:extension && pnpm lint:backend",
     "format": "prettier . --write && pnpm format:backend",
     "format:check": "prettier . --check && pnpm format:backend:check",
-    "package:extension": "pnpm build:extension"
+    "package:extension": "pnpm build:extension",
+    "verify": "pnpm format:check && pnpm lint && pnpm typecheck:extension && pnpm test:unit && pnpm test:backend"
   },
   "devDependencies": {
     "@playwright/test": "^1.54.2",

@@ -9,7 +9,7 @@ import type {
 } from '@careeros/shared-types';
 import { create } from 'zustand';
 
-type ExtensionState = {
+export type ExtensionState = {
   snapshot: ExtensionSnapshot | null;
   settings: ExtensionSettings | null;
   backendHealth: HealthResponse | null;
@@ -40,6 +40,8 @@ type ExtensionState = {
   setError: (error: string | null) => void;
 };
 
+// Keep this store focused on cross-surface UI state.
+// Domain logic lives in feature services so components stay easier to test and evolve.
 export const useExtensionStore = create<ExtensionState>((set) => ({
   snapshot: null,
   settings: null,

@@ -6,15 +6,21 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useExtensionActions } from '@/lib/hooks/use-extension-core';
+import {
+  selectBackendHealth,
+  selectGlobalError,
+  selectSettings,
+  selectSnapshot,
+} from '../store/selectors';
 import { useExtensionStore } from '../store/use-extension-store';
 
 export function HomeRoute(): JSX.Element {
   const { openSidePanel, refreshActiveTab, updateSettings } = useExtensionActions();
-  const snapshot = useExtensionStore((state) => state.snapshot);
-  const settings = useExtensionStore((state) => state.settings);
+  const snapshot = useExtensionStore(selectSnapshot);
+  const settings = useExtensionStore(selectSettings);
   const setSettings = useExtensionStore((state) => state.setSettings);
-  const backendHealth = useExtensionStore((state) => state.backendHealth);
-  const error = useExtensionStore((state) => state.error);
+  const backendHealth = useExtensionStore(selectBackendHealth);
+  const error = useExtensionStore(selectGlobalError);
 
   async function persistSetting(
     patch:

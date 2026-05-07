@@ -1,7 +1,6 @@
 from __future__ import annotations
 
-from datetime import datetime, timezone
-from uuid import UUID, uuid4
+from uuid import UUID
 
 from fastapi import HTTPException, status
 from sqlalchemy import func, select
@@ -16,29 +15,16 @@ from app.schemas.applications_api import (
     ApplicationResponse,
     ApplicationUpdateRequest,
 )
+from app.services.application_domain import (
+    RESPONSE_RECEIVED_STATUSES,
+    build_application_analytics_response,
+    create_history_event,
+    to_application_response,
+    utc_now_iso,
+)
 from app.services.cache import cache_service
+from app.services.cache_keys import application_analytics_cache_key
 from app.services.job_service import upsert_job
-
-
-def _to_application_response(application: Application) -> ApplicationResponse:
-    return ApplicationResponse(
-        id=str(application.id),
-        user_id=str(application.user_id),
-        job_id=str(application.job_id),
-        company_name=application.job.company_name,
-        title=application.job.title,
-        status=application.status,
-        priority=application.priority,
-        source_url=application.source_url,
-        notes=application.notes,
-        interview_count=application.interview_count,
-        tags=application.tags,
-        history=application.history,
-        last_response_at=application.last_response_at,
-        applied_at=application.applied_at,
-        canonical_url=application.job.canonical_url,
-        source_platform=application.job.source_platform,
-    )
 
 
 async def list_applications(db: AsyncSession, user: User) -> list[ApplicationResponse]:
@@ -49,7 +35,7 @@ async def list_applications(db: AsyncSession, user: User) -> list[ApplicationRes
         .order_by(Application.updated_at.desc())
     )
     applications = result.scalars().unique().all()
-    return [_to_application_response(application) for application in applications]
+    return [to_application_response(application) for application in applications]
 
 
 async def create_application(
@@ -58,7 +44,7 @@ async def create_application(
     payload: ApplicationCreateRequest,
 ) -> ApplicationResponse:
     job = await upsert_job(db, payload.job)
-    now = datetime.now(timezone.utc).isoformat()
+    now = utc_now_iso()
     application = Application(
         user_id=user.id,
         job_id=job.id,
@@ -69,14 +55,7 @@ async def create_application(
         tags=payload.tags,
         interview_count=1 if payload.status == "interviewing" else 0,
         applied_at=now if payload.status != "saved" else None,
-        history=[
-            {
-                "id": str(uuid4()),
-                "status": payload.status,
-                "createdAt": now,
-                "note": payload.notes,
-            }
-        ],
+        history=[create_history_event(payload.status, payload.notes, created_at=now)],
     )
     db.add(application)
     await db.commit()
@@ -84,8 +63,8 @@ async def create_application(
         select(Application).where(Application.id == application.id).options(selectinload(Application.job))
     )
     created = refreshed.scalar_one()
-    await cache_service.delete(f"application_analytics:{user.id}")
-    return _to_application_response(created)
+    await cache_service.delete(application_analytics_cache_key(user.id))
+    return to_application_response(created)
 
 
 async def update_application(
@@ -106,17 +85,12 @@ async def update_application(
         application.status = payload.status
         application.history = [
             *application.history,
-            {
-                "id": str(uuid4()),
-                "status": payload.status,
-                "createdAt": datetime.now(timezone.utc).isoformat(),
-                "note": payload.notes,
-            },
+            create_history_event(payload.status, payload.notes),
         ]
-        if payload.status in {"interviewing", "offer", "rejected"}:
-            application.last_response_at = datetime.now(timezone.utc).isoformat()
+        if payload.status in RESPONSE_RECEIVED_STATUSES:
+            application.last_response_at = utc_now_iso()
         if application.applied_at is None and payload.status != "saved":
-            application.applied_at = datetime.now(timezone.utc).isoformat()
+            application.applied_at = utc_now_iso()
     if payload.priority:
         application.priority = payload.priority
     if payload.notes is not None:
@@ -131,39 +105,23 @@ async def update_application(
         select(Application).where(Application.id == application.id).options(selectinload(Application.job))
     )
     application = refreshed.scalar_one()
-    await cache_service.delete(f"application_analytics:{user.id}")
-    return _to_application_response(application)
+    await cache_service.delete(application_analytics_cache_key(user.id))
+    return to_application_response(application)
 
 
 async def get_application_analytics(db: AsyncSession, user: User) -> ApplicationAnalyticsResponse:
-    cache_key = f"application_analytics:{user.id}"
+    cache_key = application_analytics_cache_key(user.id)
     cached = await cache_service.get_json(cache_key)
     if cached is not None:
         return ApplicationAnalyticsResponse(**cached)
 
-    result = await db.execute(select(Application.status, func.count(Application.id)).where(Application.user_id == user.id).group_by(Application.status))
-    status_counts = {status: count for status, count in result.all()}
-    total = sum(status_counts.values())
-    active = sum(status_counts.get(status, 0) for status in ("saved", "applied", "interviewing"))
-    interviews = status_counts.get("interviewing", 0) + status_counts.get("offer", 0)
-    rejections = status_counts.get("rejected", 0)
-    offers = status_counts.get("offer", 0)
-    responded = interviews + rejections
-
-    response = ApplicationAnalyticsResponse(
-        total_applications=total,
-        active_applications=active,
-        interview_count=interviews,
-        rejection_count=rejections,
-        offer_count=offers,
-        response_rate=round((responded / total) * 100) if total else 0,
-        interview_rate=round((interviews / total) * 100) if total else 0,
-        rejection_rate=round((rejections / total) * 100) if total else 0,
-        status_counts={
-            status_name: status_counts.get(status_name, 0)
-            for status_name in ("saved", "applied", "interviewing", "offer", "rejected", "withdrawn")
-        },
+    result = await db.execute(
+        select(Application.status, func.count(Application.id))
+        .where(Application.user_id == user.id)
+        .group_by(Application.status)
     )
+    status_counts = {status_name: count for status_name, count in result.all()}
+    response = build_application_analytics_response(status_counts)
     await cache_service.set_json(
         cache_key,
         response.model_dump(),

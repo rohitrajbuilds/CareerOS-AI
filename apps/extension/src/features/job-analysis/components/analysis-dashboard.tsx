@@ -1,4 +1,9 @@
 import type { JobAnalysisRecommendation, JobRequirement } from '@careeros/shared-types';
+import {
+  selectJobAnalysis,
+  selectJobAnalysisError,
+  selectJobAnalysisLoading,
+} from '@/sidepanel/store/selectors';
 import { useExtensionStore } from '@/sidepanel/store/use-extension-store';
 import { useJobAnalysis } from '../hooks/use-job-analysis';
 import { BreakdownChart } from './breakdown-chart';
@@ -52,9 +57,9 @@ function renderRequirement(requirement: JobRequirement): JSX.Element {
 }
 
 export function AnalysisDashboard(): JSX.Element {
-  const analysis = useExtensionStore((state) => state.jobAnalysis);
-  const loading = useExtensionStore((state) => state.jobAnalysisLoading);
-  const error = useExtensionStore((state) => state.jobAnalysisError);
+  const analysis = useExtensionStore(selectJobAnalysis);
+  const loading = useExtensionStore(selectJobAnalysisLoading);
+  const error = useExtensionStore(selectJobAnalysisError);
   const { analyzeCurrentJob } = useJobAnalysis();
 
   return (

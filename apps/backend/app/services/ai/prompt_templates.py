@@ -1,17 +1,12 @@
 from app.schemas.ai import AiGenerationRequest
-
-
-def trim_text(value: str | None, max_chars: int) -> str:
-    if not value:
-        return ""
-    return value[:max_chars]
+from app.services.ai.text_utils import trim_text, trim_text_list
 
 
 def build_template_instructions(request: AiGenerationRequest) -> str:
     prompt_map = {
         "cover_letter": (
             "Write a concise, modern cover letter tailored to the role. "
-            "Avoid clichés, be specific, and stay factual."
+            "Avoid cliches, be specific, and stay factual."
         ),
         "why_company": (
             "Answer why the candidate wants to work at this company. "
@@ -70,7 +65,7 @@ def build_user_prompt(request: AiGenerationRequest) -> str:
         "Job description excerpt:",
         trim_text(job.jobDescription, 8000) or "No job description extracted.",
         "Nearby field text:",
-        "\n".join(job.nearbyText[:10]) or "None",
+        "\n".join(trim_text_list(job.nearbyText, 10)) or "None",
         "Additional user hint:",
         request.promptHint or "None",
         (

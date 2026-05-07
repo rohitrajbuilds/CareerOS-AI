@@ -1,3 +1,8 @@
+import {
+  selectCompanyResearch,
+  selectCompanyResearchError,
+  selectCompanyResearchLoading,
+} from '@/sidepanel/store/selectors';
 import { useExtensionStore } from '@/sidepanel/store/use-extension-store';
 import { useCompanyResearch } from '../hooks/use-company-research';
 
@@ -6,9 +11,9 @@ function SectionTitle({ children }: { children: string }): JSX.Element {
 }
 
 export function CompanyInsightsCard(): JSX.Element {
-  const research = useExtensionStore((state) => state.companyResearch);
-  const loading = useExtensionStore((state) => state.companyResearchLoading);
-  const error = useExtensionStore((state) => state.companyResearchError);
+  const research = useExtensionStore(selectCompanyResearch);
+  const loading = useExtensionStore(selectCompanyResearchLoading);
+  const error = useExtensionStore(selectCompanyResearchError);
   const { researchCurrentCompany } = useCompanyResearch();
 
   return (

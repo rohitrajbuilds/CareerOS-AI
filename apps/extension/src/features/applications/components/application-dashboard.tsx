@@ -3,20 +3,20 @@ import type {
   ApplicationRecord,
   ApplicationStatus,
 } from '@careeros/shared-types';
+import { APPLICATION_STATUSES } from '@careeros/shared-types';
 import { startTransition, useDeferredValue, useMemo, useState } from 'react';
+import {
+  selectApplicationAnalytics,
+  selectApplicationDashboard,
+  selectApplicationDashboardError,
+  selectApplicationDashboardLoading,
+} from '@/sidepanel/store/selectors';
 import { useExtensionStore } from '@/sidepanel/store/use-extension-store';
 import { useApplicationDashboard } from '../hooks/use-application-dashboard';
 
 type SortKey = 'updatedAt' | 'createdAt' | 'companyName' | 'roleTitle' | 'status';
 
-const STATUS_OPTIONS: ApplicationStatus[] = [
-  'saved',
-  'applied',
-  'interviewing',
-  'offer',
-  'rejected',
-  'withdrawn',
-];
+const STATUS_OPTIONS: ApplicationStatus[] = APPLICATION_STATUSES;
 
 const PRIORITY_OPTIONS: Array<ApplicationPriority | 'all'> = ['all', 'high', 'medium', 'low'];
 
@@ -215,10 +215,10 @@ function ApplicationRow({
 }
 
 export function ApplicationDashboard(): JSX.Element {
-  const dashboard = useExtensionStore((state) => state.applicationDashboard);
-  const analytics = useExtensionStore((state) => state.applicationAnalytics);
-  const loading = useExtensionStore((state) => state.applicationDashboardLoading);
-  const error = useExtensionStore((state) => state.applicationDashboardError);
+  const dashboard = useExtensionStore(selectApplicationDashboard);
+  const analytics = useExtensionStore(selectApplicationAnalytics);
+  const loading = useExtensionStore(selectApplicationDashboardLoading);
+  const error = useExtensionStore(selectApplicationDashboardError);
   const { saveCurrentApplication, changeApplicationStatus, updateApplicationNotes, exportCsv } =
     useApplicationDashboard();
 

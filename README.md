@@ -34,3 +34,9 @@ uvicorn app.main:app --reload
 - Backend API: deploy `apps/backend` to Railway using the provided `apps/backend/railway.toml` and GitHub Actions workflow.
 - Legal and privacy site: deploy `apps/legal-site` to Vercel using its `vercel.json` and GitHub Actions workflow.
 - Chrome extension: build `apps/extension/dist`, package it as a zip, and submit it through the Chrome Web Store dashboard with the documents in `docs/deployment`.
+
+## Developer experience
+
+- Run `pnpm verify` for the main repo quality gate.
+- Review [CONTRIBUTING.md](</e:/CareerOS AI/CONTRIBUTING.md>) before large feature work.
+- See [docs/architecture/refactor-notes.md](</e:/CareerOS AI/docs/architecture/refactor-notes.md>) for the current organization rules.
