@@ -11,11 +11,33 @@ export type SiteContext = {
   lastDetectedAt?: string;
 };
 
+export type FieldType =
+  | 'text'
+  | 'email'
+  | 'phone'
+  | 'url'
+  | 'textarea'
+  | 'select'
+  | 'checkbox'
+  | 'radio'
+  | 'number'
+  | 'date'
+  | 'file'
+  | 'search'
+  | 'unknown';
+
 export type FormField = {
   id: string;
+  type: FieldType;
+  confidence: number;
+  selector: string;
+  xpath: string;
   label: string;
-  type: string;
   required: boolean;
+  placeholder?: string;
+  ariaLabel?: string;
+  name?: string;
+  nearbyText: string[];
 };
 
 export type AutofillResult = {

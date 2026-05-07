@@ -40,6 +40,18 @@ function schedulePageStateNotification(): void {
   }, 250);
 }
 
+function registerDynamicRescanTriggers(): void {
+  const triggerRescan = () => schedulePageStateNotification();
+
+  document.addEventListener('input', triggerRescan, true);
+  document.addEventListener('change', triggerRescan, true);
+  window.addEventListener('load', triggerRescan, { once: true });
+
+  window.setTimeout(() => {
+    triggerRescan();
+  }, 1500);
+}
+
 async function bootstrapContentScript(): Promise<void> {
   if (hasBootstrapped) {
     return;
@@ -60,6 +72,7 @@ async function bootstrapContentScript(): Promise<void> {
   observeDocument(() => {
     schedulePageStateNotification();
   });
+  registerDynamicRescanTriggers();
 
   void autofillKnownFields();
 }

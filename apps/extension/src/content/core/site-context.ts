@@ -27,5 +27,6 @@ export function getSiteContext(): SiteContext {
     provider: detectProvider(url),
     url: url.toString(),
     title: document.title,
+    hostname: url.hostname,
   };
 }
