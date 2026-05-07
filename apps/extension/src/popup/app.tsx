@@ -1,58 +1,83 @@
 import '@/styles/tailwind.css';
 import { useBackendHealth, useExtensionActions, useExtensionSnapshot } from '@/lib/hooks/use-extension-core';
 import { useLiveExtensionSnapshot } from '@/lib/hooks/use-live-extension-snapshot';
+import { useStorageValue } from '@/lib/hooks/use-storage-value';
+import { useThemeSync } from '@/lib/theme/theme';
+import { Button } from '@/components/ui/button';
+import { Card, HeroCard } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { ThemeToggle } from '@/components/ui/theme-toggle';
 
 export function PopupApp(): JSX.Element {
   const { error: snapshotError, isLoading, refresh } = useExtensionSnapshot();
   const snapshot = useLiveExtensionSnapshot();
   const { data: backendHealth } = useBackendHealth();
-  const { openSidePanel, refreshActiveTab } = useExtensionActions();
+  const settings = useStorageValue('settings', 'local');
+  const { openSidePanel, refreshActiveTab, updateSettings } = useExtensionActions();
+  useThemeSync();
 
   return (
-    <main className="w-[360px] bg-[var(--color-background)] p-4 text-[var(--color-text)]">
-      <div className="rounded-[var(--radius-card)] border border-[var(--color-border)] bg-[var(--color-surface)] p-4 shadow-sm">
-        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--color-text-muted)]">
-          CareerOS AI
-        </p>
-        <h1 className="mt-2 text-lg font-semibold">Extension Control Center</h1>
-        <p className="mt-2 text-sm text-[var(--color-text-muted)]">
-          {isLoading
-            ? 'Loading extension state...'
-            : snapshot?.activeSession
-              ? `${snapshot.activeSession.provider} detected on the active tab`
-              : 'No supported job application page detected on the active tab'}
-        </p>
-        <dl className="mt-4 space-y-2 text-sm text-[var(--color-text-muted)]">
-          <div className="flex justify-between gap-3">
-            <dt>Active tab</dt>
-            <dd>{snapshot?.activeTabId ?? 'None'}</dd>
+    <main className="w-[388px] p-4 text-[var(--color-text)]">
+      <div className="grid gap-4">
+        <HeroCard className="overflow-hidden p-5">
+          <div className="flex items-start justify-between gap-3">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[var(--color-text-muted)]">
+                CareerOS AI
+              </p>
+              <h1 className="mt-2 text-xl font-semibold">Control Center</h1>
+              <p className="mt-2 text-sm leading-6 text-[var(--color-text-muted)]">
+                {isLoading
+                  ? 'Loading extension state...'
+                  : snapshot?.activeSession
+                    ? `${snapshot.activeSession.provider} workflow is active on this tab.`
+                    : 'No supported job application page is active yet.'}
+              </p>
+            </div>
+            <Badge tone={backendHealth?.status === 'ok' ? 'success' : 'warning'}>
+              {backendHealth?.status ?? 'offline'}
+            </Badge>
           </div>
-          <div className="flex justify-between gap-3">
-            <dt>Session</dt>
-            <dd>{snapshot?.activeSession?.status ?? 'Idle'}</dd>
+          <div className="mt-5 flex flex-wrap gap-2">
+            <Button onClick={() => void openSidePanel()}>Open workspace</Button>
+            <Button variant="secondary" onClick={() => void refreshActiveTab().then(refresh)}>
+              Refresh tab
+            </Button>
           </div>
-          <div className="flex justify-between gap-3">
-            <dt>Backend</dt>
-            <dd>{backendHealth?.status ?? 'Offline'}</dd>
+        </HeroCard>
+
+        <Card className="grid gap-3">
+          <div className="flex items-center justify-between">
+            <span className="text-sm font-semibold">Appearance</span>
+            <ThemeToggle
+              value={settings?.themeMode ?? 'system'}
+              onChange={(themeMode) => void updateSettings({ themeMode })}
+            />
           </div>
-        </dl>
-        {snapshotError ? <p className="mt-3 text-sm text-red-600">{snapshotError}</p> : null}
-        <div className="mt-4 flex flex-col gap-2">
-          <button
-            type="button"
-            className="rounded-full bg-[var(--color-primary)] px-4 py-2 text-sm font-medium text-[var(--color-primary-foreground)]"
-            onClick={() => void openSidePanel()}
-          >
-            Open side panel
-          </button>
-          <button
-            type="button"
-            className="rounded-full border border-[var(--color-border)] px-4 py-2 text-sm font-medium"
-            onClick={() => void refreshActiveTab().then(refresh)}
-          >
-            Refresh active tab
-          </button>
-        </div>
+          <div className="grid grid-cols-3 gap-3">
+            <div className="rounded-2xl bg-white/8 p-3">
+              <p className="text-[11px] uppercase tracking-[0.18em] text-[var(--color-text-muted)]">
+                Active tab
+              </p>
+              <p className="mt-2 text-lg font-semibold">{snapshot?.activeTabId ?? '-'}</p>
+            </div>
+            <div className="rounded-2xl bg-white/8 p-3">
+              <p className="text-[11px] uppercase tracking-[0.18em] text-[var(--color-text-muted)]">
+                Session
+              </p>
+              <p className="mt-2 text-lg font-semibold capitalize">
+                {snapshot?.activeSession?.status ?? 'idle'}
+              </p>
+            </div>
+            <div className="rounded-2xl bg-white/8 p-3">
+              <p className="text-[11px] uppercase tracking-[0.18em] text-[var(--color-text-muted)]">
+                Backend
+              </p>
+              <p className="mt-2 text-lg font-semibold">{backendHealth?.status ?? 'offline'}</p>
+            </div>
+          </div>
+          {snapshotError ? <p className="text-sm text-rose-500">{snapshotError}</p> : null}
+        </Card>
       </div>
     </main>
   );

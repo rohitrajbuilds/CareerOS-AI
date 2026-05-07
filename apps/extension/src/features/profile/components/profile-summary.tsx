@@ -1,3 +1,5 @@
+import { motion } from 'framer-motion';
+import { Badge } from '@/components/ui/badge';
 import { getProfileCompletion } from '../completion';
 import { useProfileStore } from '../store';
 
@@ -10,7 +12,12 @@ export function ProfileSummaryCard(): JSX.Element {
   const completion = getProfileCompletion(record.profile);
 
   return (
-    <article className="rounded-[var(--radius-card)] border border-[var(--color-border)] bg-[var(--color-surface)] p-5 shadow-sm">
+    <motion.article
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.35 }}
+      className="glass-panel rounded-[var(--radius-card)] p-5"
+    >
       <div className="flex items-start justify-between gap-4">
         <div>
           <h2 className="text-lg font-semibold">Profile Readiness</h2>
@@ -21,14 +28,12 @@ export function ProfileSummaryCard(): JSX.Element {
         </div>
         <div className="text-right">
           <p className="text-2xl font-semibold">{completion.percentage}%</p>
-          <p className="text-xs text-[var(--color-text-muted)]">
-            {completion.completedFields}/{completion.totalFields} core fields
-          </p>
+          <Badge>{completion.completedFields}/{completion.totalFields} fields</Badge>
         </div>
       </div>
-      <div className="mt-4 h-3 overflow-hidden rounded-full bg-[var(--color-surface-muted)]">
+      <div className="mt-4 h-3 overflow-hidden rounded-full bg-[var(--color-surface-muted)]/90">
         <div
-          className="h-full rounded-full bg-[var(--color-primary)] transition-all"
+          className="h-full rounded-full bg-[linear-gradient(135deg,var(--color-primary),var(--color-accent))] transition-all"
           style={{ width: `${completion.percentage}%` }}
         />
       </div>
@@ -38,6 +43,6 @@ export function ProfileSummaryCard(): JSX.Element {
         <div>{lastSavedAt ? `Last saved ${new Date(lastSavedAt).toLocaleTimeString()}` : 'Not saved yet'}</div>
       </div>
       {saveError ? <p className="mt-3 text-sm text-red-600">{saveError}</p> : null}
-    </article>
+    </motion.article>
   );
 }

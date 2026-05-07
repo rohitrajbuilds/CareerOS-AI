@@ -6,40 +6,52 @@ import { ResumeManager } from '@/features/profile/components/resume-manager';
 import { ProfileSummaryCard } from '@/features/profile/components/profile-summary';
 import { useProfileBootstrap } from '@/features/profile/hooks/use-profile-bootstrap';
 import { useProfileStore } from '@/features/profile/store';
+import { useThemeSync } from '@/lib/theme/theme';
+import { ThemeToggle } from '@/components/ui/theme-toggle';
+import { Button } from '@/components/ui/button';
+import { Card, HeroCard } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 
 export function OptionsApp(): JSX.Element {
   useProfileBootstrap();
+  useThemeSync();
 
   const settings = useStorageValue('settings', 'local');
   const { updateSettings } = useExtensionActions();
   const isLoaded = useProfileStore((state) => state.isLoaded);
 
   return (
-    <main className="min-h-screen bg-[linear-gradient(180deg,#f4f7fb_0%,#eef3ff_100%)] px-4 py-6 text-[var(--color-text)] md:px-6 md:py-10">
+    <main className="min-h-screen px-4 py-6 text-[var(--color-text)] md:px-6 md:py-10">
       <div className="mx-auto flex max-w-6xl flex-col gap-6">
-        <section className="overflow-hidden rounded-[28px] border border-white/70 bg-[radial-gradient(circle_at_top_left,#ffffff_0%,#f7f9ff_55%,#eef3ff_100%)] p-6 shadow-[0_25px_60px_rgba(16,35,63,0.08)] md:p-8">
+        <HeroCard className="overflow-hidden p-6 md:p-8">
           <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
             <div className="max-w-3xl">
               <p className="text-sm font-semibold uppercase tracking-[0.24em] text-[var(--color-text-muted)]">
                 CareerOS AI
               </p>
-              <h1 className="mt-2 text-3xl font-semibold md:text-4xl">Profile Management</h1>
+              <h1 className="mt-2 text-3xl font-semibold md:text-4xl">Workspace Preferences</h1>
               <p className="mt-3 text-sm leading-6 text-[var(--color-text-muted)] md:text-base">
                 Build a structured source-of-truth profile for autofill, resume routing, and
-                AI-generated application responses. All profile and resume data is encrypted before
-                it is persisted in local extension storage.
+                AI-generated application responses. Everything is wrapped in local encrypted storage
+                and a premium operator console designed for daily job-search flow.
               </p>
             </div>
-            <div className="rounded-2xl border border-[var(--color-border)] bg-white/80 px-4 py-3 text-sm text-[var(--color-text-muted)] backdrop-blur">
-              {isLoaded ? 'Autosave active' : 'Loading encrypted profile store...'}
+            <div className="flex flex-col items-end gap-3">
+              <Badge tone={isLoaded ? 'success' : 'warning'}>
+                {isLoaded ? 'Autosave active' : 'Loading profile'}
+              </Badge>
+              <ThemeToggle
+                value={settings?.themeMode ?? 'system'}
+                onChange={(themeMode) => void updateSettings({ themeMode })}
+              />
             </div>
           </div>
-        </section>
+        </HeroCard>
 
         <ProfileSummaryCard />
 
         <div className="grid gap-6 xl:grid-cols-[1.7fr_1fr]">
-          <section className="rounded-[var(--radius-card)] border border-[var(--color-border)] bg-[var(--color-surface)] p-5 shadow-sm md:p-6">
+          <Card className="p-5 md:p-6">
             <div className="mb-5">
               <h2 className="text-xl font-semibold">Core Profile</h2>
               <p className="mt-2 text-sm text-[var(--color-text-muted)]">
@@ -54,18 +66,18 @@ export function OptionsApp(): JSX.Element {
                 Loading profile editor...
               </div>
             )}
-          </section>
+          </Card>
 
           <div className="flex flex-col gap-6">
             <ResumeManager />
 
-            <section className="rounded-[var(--radius-card)] border border-[var(--color-border)] bg-[var(--color-surface)] p-5 shadow-sm">
+            <Card className="p-5">
               <h2 className="text-lg font-semibold">Extension Preferences</h2>
               <p className="mt-2 text-sm text-[var(--color-text-muted)]">
                 These settings stay shared across popup, background, sidepanel, and options.
               </p>
               <div className="mt-5 grid gap-4">
-                <label className="flex items-center justify-between rounded-xl border border-[var(--color-border)] px-4 py-3">
+                <label className="flex items-center justify-between rounded-2xl border border-[var(--color-border)] bg-[var(--color-background-elevated)] px-4 py-3">
                   <span className="text-sm">Extension enabled</span>
                   <input
                     type="checkbox"
@@ -75,7 +87,7 @@ export function OptionsApp(): JSX.Element {
                     }
                   />
                 </label>
-                <label className="flex items-center justify-between rounded-xl border border-[var(--color-border)] px-4 py-3">
+                <label className="flex items-center justify-between rounded-2xl border border-[var(--color-border)] bg-[var(--color-background-elevated)] px-4 py-3">
                   <span className="text-sm">Auto-open sidepanel</span>
                   <input
                     type="checkbox"
@@ -85,7 +97,7 @@ export function OptionsApp(): JSX.Element {
                     }
                   />
                 </label>
-                <label className="flex items-center justify-between rounded-xl border border-[var(--color-border)] px-4 py-3">
+                <label className="flex items-center justify-between rounded-2xl border border-[var(--color-border)] bg-[var(--color-background-elevated)] px-4 py-3">
                   <span className="text-sm">Debug mode</span>
                   <input
                     type="checkbox"
@@ -95,8 +107,15 @@ export function OptionsApp(): JSX.Element {
                     }
                   />
                 </label>
+                <Button
+                  variant="secondary"
+                  className="justify-center"
+                  onClick={() => void updateSettings({ themeMode: settings?.themeMode ?? 'system' })}
+                >
+                  Sync preferences
+                </Button>
               </div>
-            </section>
+            </Card>
           </div>
         </div>
       </div>

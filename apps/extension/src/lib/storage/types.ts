@@ -14,6 +14,7 @@ export const defaultExtensionSettings: ExtensionSettings = {
   extensionEnabled: true,
   autoOpenSidePanel: false,
   debugMode: false,
+  themeMode: 'system',
 };
 
 export const storageDefaults: StorageSchema = {

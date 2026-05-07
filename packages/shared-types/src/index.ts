@@ -91,6 +91,7 @@ export type ExtensionSettings = {
   extensionEnabled: boolean;
   autoOpenSidePanel: boolean;
   debugMode: boolean;
+  themeMode: 'light' | 'dark' | 'system';
 };
 
 export type SponsorshipStatus =
