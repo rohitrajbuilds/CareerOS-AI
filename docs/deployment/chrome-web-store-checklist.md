@@ -19,6 +19,7 @@
 - Detailed description
 - Support email
 - Privacy policy URL
+- Permissions explanation URL
 
 ## Release checks
 

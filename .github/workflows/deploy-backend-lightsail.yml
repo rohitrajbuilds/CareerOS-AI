@@ -1,0 +1,38 @@
+name: Deploy Backend to Lightsail
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - 'apps/backend/**'
+      - 'infra/aws/lightsail/**'
+      - '.github/workflows/deploy-backend-lightsail.yml'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup SSH key
+        env:
+          LIGHTSAIL_SSH_KEY: ${{ secrets.LIGHTSAIL_SSH_KEY }}
+        run: |
+          mkdir -p ~/.ssh
+          printf "%s" "$LIGHTSAIL_SSH_KEY" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H "${{ secrets.LIGHTSAIL_HOST }}" >> ~/.ssh/known_hosts
+
+      - name: Deploy on Lightsail
+        run: |
+          ssh "${{ secrets.LIGHTSAIL_USER }}@${{ secrets.LIGHTSAIL_HOST }}" '
+            set -e
+            cd "${{ secrets.LIGHTSAIL_APP_DIR }}"
+            git pull origin main
+            chmod +x infra/aws/lightsail/deploy.sh
+            ./infra/aws/lightsail/deploy.sh
+          '

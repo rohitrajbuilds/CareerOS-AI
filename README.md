@@ -31,8 +31,8 @@ uvicorn app.main:app --reload
 
 ## Production
 
-- Backend API: deploy `apps/backend` to Railway using the provided `apps/backend/railway.toml` and GitHub Actions workflow.
-- Legal and privacy site: deploy `apps/legal-site` to Vercel using its `vercel.json` and GitHub Actions workflow.
+- Backend API: deploy `apps/backend` to AWS Lightsail using the files in [infra/aws/lightsail](</e:/CareerOS AI/infra/aws/lightsail>).
+- Legal and privacy site: deploy `apps/legal-site` to S3 using the provided GitHub Actions workflow.
 - Chrome extension: build `apps/extension/dist`, package it as a zip, and submit it through the Chrome Web Store dashboard with the documents in `docs/deployment`.
 
 ## Developer experience

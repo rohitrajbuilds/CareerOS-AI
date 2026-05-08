@@ -2,26 +2,26 @@
 
 ## Targets
 
-- Railway: FastAPI backend in `apps/backend`
-- Vercel: static trust center in `apps/legal-site`
+- AWS Lightsail: FastAPI backend in `apps/backend`
+- AWS S3: static trust center in `apps/legal-site`
 - Chrome Web Store: packaged extension from `apps/extension/dist`
 
-## Backend on Railway
+## Backend on AWS Lightsail
 
-1. Create a Railway project with `production` and `staging` environments.
-2. Add a PostgreSQL service and a Redis service.
-3. Create a backend service linked to this repository.
-4. Configure the service to use [apps/backend/railway.toml](</e:/CareerOS AI/apps/backend/railway.toml>) as the Railway config-as-code file.
-5. Set the production variables from [apps/backend/.env.production.example](</e:/CareerOS AI/apps/backend/.env.production.example>).
-6. Confirm the service listens on Railway's injected `PORT` through [apps/backend/docker/entrypoint.sh](</e:/CareerOS AI/apps/backend/docker/entrypoint.sh>).
-7. Verify the health check path is `/`.
+1. Create a Lightsail Linux instance.
+2. Attach a static IP.
+3. Point your API subdomain to that static IP.
+4. Provision Docker with [infra/aws/lightsail/provision-ubuntu.sh](</e:/CareerOS AI/infra/aws/lightsail/provision-ubuntu.sh>).
+5. Use [infra/aws/lightsail/.env.example](</e:/CareerOS AI/infra/aws/lightsail/.env.example>) as the base for `infra/aws/lightsail/.env`.
+6. Deploy with [infra/aws/lightsail/deploy.sh](</e:/CareerOS AI/infra/aws/lightsail/deploy.sh>).
+7. Verify `/` and `/api/v1/extension/health`.
 
-## Legal site on Vercel
+## Legal site on AWS S3
 
-1. Import the repository into Vercel.
-2. Set the Vercel project root directory to `apps/legal-site`.
-3. Use the included [apps/legal-site/vercel.json](</e:/CareerOS AI/apps/legal-site/vercel.json>).
-4. Attach the production domain that will be used in the Chrome Web Store privacy policy field.
+1. Create a public S3 bucket for the legal site.
+2. Enable static website hosting.
+3. Upload the contents of `apps/legal-site`.
+4. Use the public privacy URL in the Chrome Web Store listing.
 
 ## Extension release
 
