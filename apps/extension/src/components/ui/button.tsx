@@ -7,6 +7,7 @@ type ButtonVariant = 'primary' | 'secondary' | 'ghost';
 type ButtonProps = PropsWithChildren<
   ButtonHTMLAttributes<HTMLButtonElement> & {
     variant?: ButtonVariant;
+    motionDisabled?: boolean;
   }
 >;
 
@@ -23,12 +24,13 @@ export function Button({
   className,
   variant = 'primary',
   type = 'button',
+  motionDisabled = false,
   ...props
 }: ButtonProps): JSX.Element {
   return (
     <motion.button
-      whileHover={{ y: -1, scale: 1.01 }}
-      whileTap={{ scale: 0.99 }}
+      whileHover={motionDisabled ? undefined : { y: -1, scale: 1.01 }}
+      whileTap={motionDisabled ? undefined : { scale: 0.99 }}
       type={type}
       className={clsx(
         'inline-flex items-center justify-center rounded-[var(--radius-pill)] px-4 py-2.5 text-sm font-semibold transition focus:outline-none focus:ring-2 focus:ring-[var(--color-ring)] disabled:cursor-not-allowed disabled:opacity-60',

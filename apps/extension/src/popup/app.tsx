@@ -17,16 +17,16 @@ export function PopupApp(): JSX.Element {
   useThemeSync();
 
   return (
-    <main className="w-[388px] p-4 text-[var(--color-text)]">
+    <main className="h-[452px] w-[388px] overflow-hidden p-4 text-[var(--color-text)]">
       <div className="grid gap-4">
-        <HeroCard className="overflow-hidden p-5">
+        <HeroCard data-motion="disabled" className="min-h-[196px] overflow-hidden p-5">
           <div className="flex items-start justify-between gap-3">
             <div>
               <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[var(--color-text-muted)]">
                 CareerOS AI
               </p>
               <h1 className="mt-2 text-xl font-semibold">Control Center</h1>
-              <p className="mt-2 text-sm leading-6 text-[var(--color-text-muted)]">
+              <p className="mt-2 min-h-[72px] text-sm leading-6 text-[var(--color-text-muted)]">
                 {isLoading
                   ? 'Loading extension state...'
                   : snapshot?.activeSession
@@ -39,17 +39,24 @@ export function PopupApp(): JSX.Element {
             </Badge>
           </div>
           <div className="mt-5 flex flex-wrap gap-2">
-            <Button onClick={() => void openSidePanel()}>Open workspace</Button>
-            <Button variant="secondary" onClick={() => void refreshActiveTab().then(refresh)}>
+            <Button motionDisabled onClick={() => void openSidePanel()}>
+              Open workspace
+            </Button>
+            <Button
+              motionDisabled
+              variant="secondary"
+              onClick={() => void refreshActiveTab().then(refresh)}
+            >
               Refresh tab
             </Button>
           </div>
         </HeroCard>
 
-        <Card className="grid gap-3">
+        <Card data-motion="disabled" className="grid min-h-[220px] gap-3">
           <div className="flex items-center justify-between">
             <span className="text-sm font-semibold">Appearance</span>
             <ThemeToggle
+              motionDisabled
               value={settings?.themeMode ?? 'system'}
               onChange={(themeMode) => void updateSettings({ themeMode })}
             />

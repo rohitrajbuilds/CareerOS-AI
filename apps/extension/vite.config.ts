@@ -1,13 +1,31 @@
-import { readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
-import { defineConfig, type Plugin } from 'vite';
+import { defineConfig, loadEnv, type Plugin } from 'vite';
 import react from '@vitejs/plugin-react';
 
 const root = resolve(__dirname, 'src');
 const publicDir = resolve(__dirname, 'public');
 const manifestPath = resolve(publicDir, 'manifest.json');
 
-function manifestTransformPlugin(mode: string): Plugin {
+type ExtensionEnv = {
+  VITE_API_BASE_URL?: string;
+};
+
+function getApiHostPermission(env: ExtensionEnv): string | null {
+  const apiBaseUrl = env.VITE_API_BASE_URL?.trim();
+  if (!apiBaseUrl) {
+    return null;
+  }
+
+  try {
+    const url = new URL(apiBaseUrl);
+    return `${url.origin}/*`;
+  } catch {
+    return null;
+  }
+}
+
+function manifestTransformPlugin(mode: string, env: ExtensionEnv): Plugin {
   return {
     name: 'careeros-manifest-transform',
     apply: 'build',
@@ -19,6 +37,16 @@ function manifestTransformPlugin(mode: string): Plugin {
 
       const manifest = JSON.parse(readFileSync(manifestPath, 'utf-8')) as {
         host_permissions?: string[];
+        background?: {
+          service_worker?: string;
+        };
+        action?: {
+          default_popup?: string;
+        };
+        side_panel?: {
+          default_path?: string;
+        };
+        options_page?: string;
       };
 
       if (mode === 'production') {
@@ -31,14 +59,54 @@ function manifestTransformPlugin(mode: string): Plugin {
         );
       }
 
+      const apiHostPermission = getApiHostPermission(env);
+      if (apiHostPermission) {
+        manifest.host_permissions = Array.from(
+          new Set([...(manifest.host_permissions ?? []), apiHostPermission]),
+        );
+      }
+
+      const popupEntry = 'src/popup/index.html';
+      const sidePanelEntry = 'src/sidepanel/index.html';
+      const optionsEntry = 'src/options/index.html';
+      const backgroundEntry = 'background/service-worker.js';
+
+      if (existsSync(resolve(outputDir, popupEntry))) {
+        manifest.action = {
+          ...(manifest.action ?? {}),
+          default_popup: popupEntry,
+        };
+      }
+
+      if (existsSync(resolve(outputDir, sidePanelEntry))) {
+        manifest.side_panel = {
+          ...(manifest.side_panel ?? {}),
+          default_path: sidePanelEntry,
+        };
+      }
+
+      if (existsSync(resolve(outputDir, optionsEntry))) {
+        manifest.options_page = optionsEntry;
+      }
+
+      if (existsSync(resolve(outputDir, backgroundEntry))) {
+        manifest.background = {
+          ...(manifest.background ?? {}),
+          service_worker: backgroundEntry,
+        };
+      }
+
       const targetPath = resolve(outputDir, 'manifest.json');
       writeFileSync(targetPath, `${JSON.stringify(manifest, null, 2)}\n`, 'utf-8');
     },
   };
 }
 
-export default defineConfig(({ mode }) => ({
-  plugins: [react(), manifestTransformPlugin(mode)],
+export default defineConfig(({ mode }) => {
+  const env = loadEnv(mode, __dirname, 'VITE_');
+
+  return {
+  plugins: [react(), manifestTransformPlugin(mode, env)],
   publicDir,
   resolve: {
     alias: {
@@ -61,7 +129,7 @@ export default defineConfig(({ mode }) => ({
       output: {
         entryFileNames: (chunkInfo) => {
           if (chunkInfo.name === 'background') {
-            return 'background/[name].js';
+            return 'background/service-worker.js';
           }
 
           if (chunkInfo.name === 'content') {
@@ -75,4 +143,5 @@ export default defineConfig(({ mode }) => ({
       },
     },
   },
-}));
+  };
+});
