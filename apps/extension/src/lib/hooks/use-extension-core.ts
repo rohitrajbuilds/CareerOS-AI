@@ -1,4 +1,5 @@
 import type {
+  AutofillResult,
   ExtensionSettings,
   ExtensionSnapshot,
   HealthResponse,
@@ -16,6 +17,7 @@ import type {
   JobAnalysisContextRuntimeResponse,
   OpenSidePanelResponse,
   SettingsResponse,
+  AutofillResponse,
   UpdateSettingsResponse,
 } from '@/lib/schema/messages';
 import { MessageType } from '@/lib/schema/message-types';
@@ -91,10 +93,35 @@ export function useExtensionActions() {
     [],
   );
 
+  const triggerAutofill = useCallback(
+    async ({
+      mode = 'fill',
+      safeMode = true,
+      debug = false,
+    }: {
+      mode?: 'fill' | 'preview' | 'undo';
+      safeMode?: boolean;
+      debug?: boolean;
+    } = {}): Promise<AutofillResult> =>
+      unwrapRuntimeResult(
+        sendRuntimeMessage<AutofillResponse>({
+          type: MessageType.AutofillForm,
+          payload: {
+            provider: 'unknown',
+            mode,
+            safeMode,
+            debug,
+          },
+        }),
+      ),
+    [],
+  );
+
   return {
     openSidePanel,
     refreshActiveTab,
     updateSettings,
     getCurrentJobContext,
+    triggerAutofill,
   };
 }

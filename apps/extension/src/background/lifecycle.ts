@@ -14,7 +14,8 @@ function isSupportedUrl(url?: string): boolean {
         url.includes('myworkdayjobs.com') ||
         url.includes('linkedin.com') ||
         url.includes('greenhouse.io') ||
-        url.includes('lever.co')),
+        url.includes('lever.co') ||
+        url.includes('docs.google.com/forms')),
   );
 }
 

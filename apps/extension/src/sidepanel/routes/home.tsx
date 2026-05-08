@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { ApplicationDashboard } from '@/features/applications/components/application-dashboard';
 import { CompanyInsightsCard } from '@/features/company-research/components/company-insights-card';
 import { AnalysisDashboard } from '@/features/job-analysis/components/analysis-dashboard';
@@ -15,7 +16,8 @@ import {
 import { useExtensionStore } from '../store/use-extension-store';
 
 export function HomeRoute(): JSX.Element {
-  const { openSidePanel, refreshActiveTab, updateSettings } = useExtensionActions();
+  const [autofillMessage, setAutofillMessage] = useState<string | null>(null);
+  const { openSidePanel, refreshActiveTab, triggerAutofill, updateSettings } = useExtensionActions();
   const snapshot = useExtensionStore(selectSnapshot);
   const settings = useExtensionStore(selectSettings);
   const setSettings = useExtensionStore((state) => state.setSettings);
@@ -30,6 +32,25 @@ export function HomeRoute(): JSX.Element {
   ): Promise<void> {
     const nextSettings = await updateSettings(patch);
     setSettings(nextSettings);
+  }
+
+  async function handleAutofill(mode: 'fill' | 'preview' | 'undo'): Promise<void> {
+    try {
+      const result = await triggerAutofill({
+        mode,
+        safeMode: mode !== 'undo',
+        debug: settings?.debugMode ?? false,
+      });
+      const prefix =
+        mode === 'preview' ? 'Preview ready' : mode === 'undo' ? 'Undo complete' : 'Autofill complete';
+      setAutofillMessage(
+        `${prefix}: ${result.filledCount} filled, ${result.unresolved.length} unresolved`,
+      );
+    } catch (autofillError) {
+      setAutofillMessage(
+        autofillError instanceof Error ? autofillError.message : 'Autofill request failed.',
+      );
+    }
   }
 
   return (
@@ -60,6 +81,15 @@ export function HomeRoute(): JSX.Element {
           </div>
         </dl>
         <div className="mt-4 flex flex-wrap gap-3">
+          <Button onClick={() => void handleAutofill('fill')}>Autofill current form</Button>
+          <Button variant="secondary" onClick={() => void handleAutofill('preview')}>
+            Preview fill
+          </Button>
+          <Button variant="ghost" onClick={() => void handleAutofill('undo')}>
+            Undo fill
+          </Button>
+        </div>
+        <div className="mt-3 flex flex-wrap gap-3">
           <Button onClick={() => void refreshActiveTab()}>
             Refresh tab session
           </Button>
@@ -67,6 +97,9 @@ export function HomeRoute(): JSX.Element {
             Re-open side panel
           </Button>
         </div>
+        {autofillMessage ? (
+          <p className="mt-4 text-sm text-[var(--color-text-muted)]">{autofillMessage}</p>
+        ) : null}
       </Card>
       <Card>
         <div className="flex items-center justify-between gap-3">
